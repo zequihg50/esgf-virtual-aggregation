@@ -29,7 +29,7 @@ schema = dict(zip(first.keys(), [tables.StringCol(MAX_SIZE)]*len(first)))
 
 File.update(schema)
 
-files = table.create_table(table.root, 'files', File, 'files', filters=filt, expectedrows=3875260)
+files = table.create_table(table.root, 'files', File, 'files', filters=filt, expectedrows=50000000)
 row = files.row
 
 append(first, row, File.keys())
@@ -38,9 +38,11 @@ for line in sys.stdin:
     append(d, row, File.keys())
 
 # https://github.com/PyTables/PyTables/issues/879
-files.cols._eva_esgf_dataset.create_index(_blocksizes=(7753728, 3876864, 6144, 1024))
-files.cols._eva_variable_aggregation.create_index(_blocksizes=(7753728, 3876864, 6144, 1024))
-files.cols._eva_variable_aggregation_levels.create_index(_blocksizes=(7753728, 3876864, 6144, 1024))
-files.cols._eva_ensemble_aggregation.create_index(_blocksizes=(7753728, 3876864, 6144, 1024))
-files.cols._eva_ensemble_aggregation_levels.create_index(_blocksizes=(7753728, 3876864, 6144, 1024))
+# Calculated based on 50.000.000 rows
+blocksizes=(100103960, 50051980, 139810, 4096)
+files.cols._eva_esgf_dataset.create_index(_blocksizes=blocksizes)
+files.cols._eva_variable_aggregation.create_index(_blocksizes=blocksizes)
+files.cols._eva_variable_aggregation_levels.create_index(_blocksizes=blocksizes)
+files.cols._eva_ensemble_aggregation.create_index(_blocksizes=blocksizes)
+files.cols._eva_ensemble_aggregation_levels.create_index(_blocksizes=blocksizes)
 table.flush()
