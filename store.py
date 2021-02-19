@@ -37,12 +37,13 @@ for line in sys.stdin:
         if c in d:
             row[c] = d[c]
     row.append()
+files.flush()
 
 for eva_aggregation in projects:
     arr = f.get_node('/' + eva_aggregation)
-    for row in files:
-        if row[eva_aggregation] not in arr:
-            arr.append([ row[eva_aggregation] ])
+    for x in files:
+        if x[eva_aggregation] not in arr[:]:
+            arr.append([ x[eva_aggregation] ])
 
 # Index table
 for eva_aggregation in projects:
