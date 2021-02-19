@@ -20,6 +20,10 @@ The idea is as follows:
 
 You can access the alpha version of the project at https://data.meteo.unican.es/thredds/catalog/devel/EVA/catalog.html.
 
+## ESGF projects
+
+ESGF Virtual Aggregation datasets are separately constructed for each ESGF project (CMIP6, CORDEX, CMIP5, ...) due to changes in metedata definition accros projects.
+
 ## Usage
 
 ```bash
