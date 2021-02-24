@@ -2,15 +2,9 @@ import sys, os
 import json
 import tables
 
-MAX_SIZE = 1000 # 1000 characters
+from config import projects
 
-projects = [
-    "_eva_esgf_dataset",
-    "_eva_variable_aggregation",
-#    "_eva_variable_aggregation_levels",
-    "_eva_ensemble_aggregation",
-#    "_eva_ensemble_aggregation_levels",
-]
+MAX_SIZE = 1000 # 1000 characters
 
 def parse_args(argv):
     args = {

@@ -2,6 +2,10 @@
 
 The aim of this project is to create a TDS catalog including **ALL** available data in ESGF, using OpenDAP endpoints to avoid downloading any data from remote repositories.
 
+You can access the alpha version of the project at https://data.meteo.unican.es/thredds/catalog/devel/EVA/catalog.html.
+
+**Why?** Because we think that currently ESGF does not make use of state of the art capabilities in their current software stack that would easily provide additional useful services for end users.
+
 The idea is as follows:
 
 1 - Use `esgf-search` to query available information.
@@ -17,8 +21,6 @@ The idea is as follows:
   - Variable levels aggregation - Aggregate all variables into a single dataset, one variable for multiple vertical levels.
   - Ensemble aggregation - Aggregate all variables and ensembles into a single dataset.
   - Ensemble levels aggregation - Aggregate all variables and ensembles into a single dataset, one variable for multiple vertical levels.
-
-You can access the alpha version of the project at https://data.meteo.unican.es/thredds/catalog/devel/EVA/catalog.html.
 
 ## ESGF projects
 
