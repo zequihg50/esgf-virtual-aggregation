@@ -24,8 +24,26 @@ You can access the alpha version of the project at https://data.meteo.unican.es/
 
 ESGF Virtual Aggregation datasets are separately constructed for each ESGF project (CMIP6, CORDEX, CMIP5, ...) due to changes in metedata definition accros projects.
 
-## Usage
-
-```bash
+Columns for CMIP6:
 
 ```
+"HTTPServer","OPENDAP","_timestamp","_version_","activity_id","checksum","checksum_type","citation_url","data_node","data_specs_version","dataset_id","experiment_id","experiment_title","frequency","further_info_url","grid","grid_label","id","index_node","instance_id","latest","master_id","member_id","mip_era","model_cohort","nominal_resolution","pid","product","project","realm","replica","retracted","score","size","source_id","source_type","sub_experiment_id","table_id","timestamp","title","tracking_id","type","url","variable","variable_id","variable_long_name","variable_units","variant_label","version"
+```
+
+Columns for CORDEX:
+
+```
+"HTTPServer","OPENDAP","_timestamp","_version_","cf_standard_name","checksum","checksum_type","data_node","dataset_id","domain","driving_model","ensemble","experiment","experiment_family","id","index_node","instance_id","institute","latest","master_id","product","project","rcm_name","rcm_version","replica","retracted","score","size","time_frequency","timestamp","title","tracking_id","type","url","variable","variable_long_name","variable_units","version"
+```
+
+## Database bootstrap
+
+./search.sh - Comment lines for projects you want to ignore. Take into account that for CMIP6 this takes a couple of days.
+
+## NcMLs
+
+## Catalogs
+
+## Regular update
+
+## Contact

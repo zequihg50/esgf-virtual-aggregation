@@ -7,26 +7,45 @@ MAX_SIZE = 1000 # 1000 characters
 projects = [
     "_eva_esgf_dataset",
     "_eva_variable_aggregation",
-    "_eva_variable_aggregation_levels",
+#    "_eva_variable_aggregation_levels",
     "_eva_ensemble_aggregation",
-    "_eva_ensemble_aggregation_levels",
+#    "_eva_ensemble_aggregation_levels",
 ]
 
-columns = projects + ["HTTPServer", "OPENDAP", "_timestamp", "_version_", "activity_id", "checksum", "checksum_type", "citation_url", "data_node", "data_specs_version", "dataset_id", "experiment_id", "experiment_title", "frequency", "further_info_url", "grid", "grid_label", "id", "index_node", "instance_id", "latest", "master_id", "member_id", "mip_era", "model_cohort", "nominal_resolution", "pid", "product", "project", "realm", "replica", "retracted", "score", "size", "source_id", "source_type", "sub_experiment_id", "table_id", "timestamp", "title", "tracking_id", "type", "url", "variable", "variable_id", "variable_long_name", "variable_units", "variant_label", "version"]
+def parse_args(argv):
+    args = {
+        'facets': [],
+        'dest': None,
+    }
 
+    pos = 1
+    arguments = len(argv) - 1
+    if arguments < 1:
+        print('Wrong usage, exiting...', file=sys.stderr)
+        sys.exit(1)
+
+    while arguments >= pos:
+        if argv[pos] == '--facets':
+            args['facets'] = argv[pos+1].split(',')
+            pos+=2
+        else:
+            args['dest'] = argv[pos]
+            pos+=1
+
+    return args
+
+args = parse_args(sys.argv)
+
+if args['dest'] is None:
+    print('Please, provide a file name destination, exiting...', file=sys.stderr)
+    sys.exit(1)
+
+columns = projects + ["HTTPServer", "OPENDAP"] + args['facets']
 schema = dict(zip(columns, [tables.StringCol(MAX_SIZE)]*len(columns)))
 
 # Create file, table and arrays
 f = tables.open_file(sys.argv[1], mode='w')
 filt = tables.Filters(complevel=1, shuffle=True)
-for eva_aggregation in projects:
-    f.create_earray(
-        f.root,
-        eva_aggregation,
-        tables.StringAtom(MAX_SIZE),
-        (0,),
-        eva_aggregation,
-        filters=filt)
 files = f.create_table(f.root, 'files', schema, 'files', filters=filt, expectedrows=50000000)
 
 # Populate table and arrays
@@ -37,16 +56,11 @@ for line in sys.stdin:
         if c in d:
             row[c] = d[c]
     row.append()
-files.flush()
 
-for eva_aggregation in projects:
-    arr = f.get_node('/' + eva_aggregation)
-    for x in files:
-        if x[eva_aggregation] not in arr[:]:
-            arr.append([ x[eva_aggregation] ])
+files.flush()
 
 # Index table
 for eva_aggregation in projects:
-    files.colinstances[eva_aggregation].create_index()
+    files.colinstances[eva_aggregation].create_csindex()
 
 f.flush()

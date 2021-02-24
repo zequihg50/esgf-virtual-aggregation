@@ -14,8 +14,12 @@ jq -r ".facet_counts.facet_fields.${subfield}|map(strings)[]" | \
 while read variable
 do
   esgf-utils/esgf-search -q "project=CMIP6 type=File variable_id=${variable}" | jq/cmip6.sh
-done | python store.py test.hdf #cmip6.hdf
+done | python store.py --fields "${fields}" cmip6.hdf
 
 # CORDEX
+while read i
+do
+    esgf-utils/esgf-search -i "${i}" -q "project=CORDEX type=File distrib=False" | jq/cordex.sh
+done < esgf-utils/indexnodes | python store.py --fields "${fields}" cordex.hdf
 
 # CMIP5
