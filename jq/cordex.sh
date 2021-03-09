@@ -14,7 +14,5 @@ if .OPENDAP then .OPENDAP |= sub("\\.html";"") else . end |
 . + {
   "_eva_esgf_dataset": [(.instance_id|split(".")[:12]|join(".")), .data_node]|join("@"),
   "_eva_variable_aggregation": [(.instance_id|split(".")[:12]|del(.[10])|join(".")), .data_node]|join("@"),
-  "_eva_variable_aggregation_levels": [(.instance_id|split(".")[:12]|del(.[10])|join(".")), .data_node]|join("@"),
   "_eva_ensemble_aggregation": [(.instance_id|split(".")[:12]|del(.[6,10])|join(".")), .data_node]|join("@"),
-  "_eva_ensemble_aggregation_levels": [(.instance_id|split(".")[:12]|del(.[6,10])|join(".")), .data_node]|join("@")
 }'

@@ -1,6 +1,6 @@
 # ESGF Virtual Aggregation Project
 
-The aim of this project is to create a TDS catalog including **ALL** available data in ESGF, using OpenDAP endpoints to avoid downloading any data from remote repositories.
+The aim of this project is to create a ready-to-deploy TDS catalog including **ALL** available data in ESGF, using OpenDAP endpoints to provide ESGF data analysis while avoiding the download of any data from remote repositories.
 
 You can access the alpha version of the project at https://data.meteo.unican.es/thredds/catalog/devel/EVA/catalog.html.
 
@@ -15,12 +15,9 @@ The idea is as follows:
 3 - Create THREDDS NcMLs and catalogs via `SantanderMetGroup/publisher` and OpenDAP endpoints.
 
 4 - Provide multiple virtual views of the datasets:
-  - Raw - Show files with no aggregation, just a virtual mirror of ESGF files like `esgf-search type=File`.
   - ESGF dataset - Aggregate files in the same way that `esgf-search type=Dataset`.
   - Variable aggregation - Aggregate all variables into a single dataset.
-  - Variable levels aggregation - Aggregate all variables into a single dataset, one variable for multiple vertical levels.
   - Ensemble aggregation - Aggregate all variables and ensembles into a single dataset.
-  - Ensemble levels aggregation - Aggregate all variables and ensembles into a single dataset, one variable for multiple vertical levels.
 
 ## ESGF projects
 
@@ -38,13 +35,10 @@ Columns for CORDEX:
 "HTTPServer","OPENDAP","_timestamp","_version_","cf_standard_name","checksum","checksum_type","data_node","dataset_id","domain","driving_model","ensemble","experiment","experiment_family","id","index_node","instance_id","institute","latest","master_id","product","project","rcm_name","rcm_version","replica","retracted","score","size","time_frequency","timestamp","title","tracking_id","type","url","variable","variable_long_name","variable_units","version"
 ```
 
-## Database bootstrap
+## Usage
 
-./search.sh - Comment lines for projects you want to ignore. Take into account that for CMIP6 this takes a couple of days.
-
-## NcMLs
-
-## Catalogs
+`./search.sh` - Comment lines for projects you want to ignore. Take into account that for CMIP6 this takes a couple of days.
+`python dump.py [--overwrite]` - Generate CSV files for datasets.
 
 ## Regular update
 

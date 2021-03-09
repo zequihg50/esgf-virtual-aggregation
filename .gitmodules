@@ -1,0 +1,6 @@
+[submodule "publisher"]
+	path = publisher
+	url = https://github.com/SantanderMetGroup/publisher
+[submodule "esgf-utils"]
+	path = esgf-utils
+	url = https://github.com/SantanderMetGroup/esgf-utils

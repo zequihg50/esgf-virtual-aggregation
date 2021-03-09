@@ -38,9 +38,9 @@ columns = projects + ["HTTPServer", "OPENDAP"] + args['facets']
 schema = dict(zip(columns, [tables.StringCol(MAX_SIZE)]*len(columns)))
 
 # Create file, table and arrays
-f = tables.open_file(sys.argv[1], mode='w')
+f = tables.open_file(args['dest'], mode='w')
 filt = tables.Filters(complevel=1, shuffle=True)
-files = f.create_table(f.root, 'files', schema, 'files', filters=filt, expectedrows=50000000)
+files = f.create_table(f.root, 'files', schema, 'files', filters=filt, expectedrows=100000000)
 
 # Populate table and arrays
 row = files.row
@@ -54,7 +54,9 @@ for line in sys.stdin:
 files.flush()
 
 # Index table
-for eva_aggregation in projects:
-    files.colinstances[eva_aggregation].create_csindex()
+#for eva_aggregation in projects:
+#    files.colinstances[eva_aggregation].create_csindex()
+files.colinstances['_eva_ensemble_aggregation'].create_csindex()
+files.colinstances['_eva_no_frequency'].create_csindex()
 
 f.flush()
