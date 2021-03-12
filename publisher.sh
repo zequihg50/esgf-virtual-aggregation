@@ -94,5 +94,5 @@ do
     creation="$(date -u +%FT%T)Z"
     ncml="${ncmls}/{mip_era}/{institution_id}/${version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_v{version}.ncml"
     python ${publisher}/jdataset.py -d ${ncml} -o variable_col=variable_id -o eva_version=${version} -o creation=${creation} -t templates/cmip6.ncml.j2 ${pickle}
-    #rm -f "${pickle}"
+    rm -f "${pickle}"
 done

@@ -9,9 +9,26 @@ df = pd.read_pickle(source)
 subset = df[('GLOBALS', 'data_node')] == 'aims3.llnl.gov'
 df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].str.replace('^http://', 'https://')
 
-# fix time values
+
+# fix time values per variable
 df[('GLOBALS', '_modified_time_coord')] = False
 for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLOBALS', 'variable_id') ):
+    # always create a time coordinate per variable
+    df.loc[vargroup.index, (varname, '_dimensions')] = \
+        df.loc[vargroup.index, (varname, '_dimensions')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+
+    if ('_d_time', 'name') in df.columns:
+        df.loc[vargroup.index, ('_d_time', 'name')] = '_'.join(['time', varname])
+
+    if (varname, 'coordinates') in df.columns:
+        df.loc[vargroup.index, (varname, 'coordinates')] = \
+            df.loc[vargroup.index, (varname, 'coordinates')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+
+    if (varname, 'cell_methods') in df.columns:
+        df.loc[vargroup.index, (varname, 'cell_methods')] = \
+            df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+
+    # modify time values if units or calendar change along the time series
     if (len(vargroup[('time', 'units')].unique()) > 1 or
         len(vargroup[('time', 'calendar')].unique()) > 1):
 
@@ -26,23 +43,10 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
         df.loc[vargroup.index, ('time', '_values')] = cftimes.apply(
             lambda dates: cftime.date2num(dates, reference_units, reference_calendar))
 
-        # need to modify some attributes when time is changed
-        df.loc[vargroup.index, ('GLOBALS', '_modified_time_coord')] = True
         df.loc[vargroup.index, ('time', 'calendar')] = reference_calendar
         df.loc[vargroup.index, ('time', 'units')] = reference_units
-        df.loc[vargroup.index, (varname, '_dimensions')] = \
-            df.loc[vargroup.index, (varname, '_dimensions')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+        df.loc[vargroup.index, ('GLOBALS', '_modified_time_coord')] = True
 
-        if ('_d_time', 'name') in df.columns:
-            df.loc[vargroup.index, ('_d_time', 'name')] = '_'.join(['time', varname])
-
-        if (varname, 'coordinates') in df.columns:
-            df.loc[vargroup.index, (varname, 'coordinates')] = \
-                df.loc[vargroup.index, (varname, 'coordinates')].str.replace(r'\btime\b', '_'.join(['time', varname]))
-
-        if (varname, 'cell_methods') in df.columns:
-            df.loc[vargroup.index, (varname, 'cell_methods')] = \
-                df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]))
 
 df.to_pickle(source)
 

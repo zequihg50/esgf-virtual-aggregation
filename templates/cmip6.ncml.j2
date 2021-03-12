@@ -75,36 +75,30 @@
             <aggregation type="union">
             {% for variable,variable_group in ensemble_group[ensemble_group[('GLOBALS', 'frequency')] != 'fx'].groupby(('GLOBALS', 'variable_id')) %}
                  <netcdf>
-                     {% if variable_group[('GLOBALS', '_modified_time_coord')].any() %}
-                     <dimension name="time_{{ variable }}" orgName="time"/>
-                     <variable name="time_{{ variable }}" orgName="time">
-                        <attribute name="_CoordinateAxisType" value="Time"/>
-                     </variable>
-                     <variable name="{{ variable }}" shape="{{ variable_group[(variable, '_dimensions')].dropna().iloc[0]|replace(',', ' ') }}">
-                        <attribute name="_CoordinateAxes" value="{{ variable_group[(variable, '_dimensions')].dropna().iloc[0]|replace(',', ' ') }}"/>
-                         {% if (variable, 'coordinates') in variable_group.columns and (not variable_group[(variable, 'coordinates')].isna().all()) %}
-                         <attribute name="coordinates" value="{{ variable_group[(variable, 'coordinates')].dropna().iloc[0]|replace(',', ' ') }}"/>
-                         {% endif %}
-                     </variable>
-                     {% endif %}
-                     <aggregation type="joinExisting" dimName="time">
+                     <aggregation type="joinExisting" dimName="time_{{ variable }}">
                          {% for _,i in variable_group.sort_values(by=[('GLOBALS', 'OPENDAP')]).iterrows() %}
-                         {% if i[('GLOBALS', '_modified_time_coord')] %}
                          <netcdf location="{{ i[('GLOBALS', 'OPENDAP')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}">
-                            <variable name="time">
+                            <dimension name="time_{{ variable }}" orgName="time"/>
+                            <variable name="time_{{ variable }}" orgName="time">
+                                <attribute name="_CoordinateAxisType" value="Time"/>
                                 <attribute name="units" value="{{ i[('time', 'units')] }}"/>
                                 <attribute name="calendar" value="{{ i[('time', 'calendar')] }}"/>
-                                <!--<values>{{ i[('time', '_values')]|join(' ') }}</values>-->
+                                {% if i[('GLOBALS', '_modified_time_coord')] %}
+                                <values>{{ i[('time', '_values')]|join(' ') }}</values>
+                                {% endif %}
                             </variable>
-                            <variable name="{{ variable }}">
+                            <variable name="{{ variable }}" shape="{{ i[(variable, '_dimensions')]|replace(',', ' ') }}">
                                 {% if (variable, 'cell_methods') in i.index and i[(variable, 'cell_methods')] %}
                                 <attribute name="cell_methods" value="{{ i[(variable, 'cell_methods')] }}"/>
                                 {% endif %}
+                                {# NEED TO UNDERSTAND THIS #}
+                                {% if (variable, 'coordinates') in i.index and i[(variable, 'coordinates')] %}
+                                <attribute name="coordinates" value="{{ i[(variable, 'coordinates')]|replace(',', ' ') }}"/>
+                                {% else %}
+                                <attribute name="_CoordinateAxes" value="{{ i[(variable, '_dimensions')]|replace(',', ' ') }}"/>
+                                {% endif %}
                             </variable>
                          </netcdf>
-                         {% else %}
-                         <netcdf location="{{ i[('GLOBALS', 'OPENDAP')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}"/>
-                         {% endif %}
                          {% endfor %}
                      </aggregation>
                  </netcdf>
