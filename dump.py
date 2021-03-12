@@ -51,8 +51,7 @@ s = set()
 for i in range(len(t)//step + 1):
     s.update( t.colindexes['_eva_ensemble_aggregation'].read_sorted(i*step, i*step+step) )
 
-a = np.array(list(s))
-for agg in a[a != b'']:
+for agg in sorted(filter(lambda x: x != b'', s)):
     dest = os.path.join(args['dest'], agg.decode('utf-8'))
     if os.path.exists(dest) and (not args['overwrite']) and os.stat(dest).st_size != 0:
         continue

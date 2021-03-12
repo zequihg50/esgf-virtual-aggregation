@@ -10,6 +10,8 @@ jq -c '
 reduce .url[] as $item (.; . + $item) |
 del(.url) |
 if .OPENDAP then .OPENDAP |= sub("\\.html";"") else . end |
+select(.OPENDAP) |
+if .version == "1" then . += {"version": .dataset_id|sub("\\|.*";"")|split(".")[-1]} else . end |
 . +=(to_entries|map(select(.value|arrays))|map(.value |= first)|from_entries) |
 . + {
   "_eva_esgf_dataset": [(.instance_id|split(".")[:10]|join(".")), .data_node]|join("@"),
