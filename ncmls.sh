@@ -7,7 +7,7 @@ trap exit SIGINT SIGKILL
 # defaults
 columns=OPENDAP,index_node,data_node,size,replica,version,retracted,_timestamp,_version_,checksum,checksum_type,_eva_ensemble_aggregation,_eva_variable_aggregation,_eva_no_frequency
 overwrite=0
-ncmls=content/public
+ncmls=content/public/EVA
 pickles=pickles
 publisher=publisher
 sources=""
@@ -43,6 +43,10 @@ do
         publisher="$2"
         shift 2
         ;;
+    --version)
+        version="$2"
+        shift 2
+        ;;
     -*)
         echo 'Unknown option, use -h for help, exiting...'
         exit 1
@@ -53,6 +57,11 @@ do
         ;;
     esac
 done
+
+if [ -z ${version} ] ; then
+    echo 'Please, indicate the version of the EVA run using --version, exiting...' >&2
+    exit 1
+fi
 
 mkdir -p ${pickles} ${ncmls}
 
@@ -90,9 +99,8 @@ do
     python cmip6.py ${pickle}
 done | while read pickle
 do
-    version="v$(date -u +%Y%m%d)"
     creation="$(date -u +%FT%T)Z"
-    ncml="${ncmls}/{mip_era}/{institution_id}/${version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{frequency}_{realm}_{grid_label}_v{version}.ncml"
-    python ${publisher}/jdataset.py -d ${ncml} -o variable_col=variable_id -o eva_version=${version} -o creation=${creation} -t templates/cmip6.ncml.j2 ${pickle}
+    ncml="${ncmls}/ensemble/{mip_era}/{institution_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{frequency}_{realm}_{grid_label}_v{version}_${version}.ncml"
+    python ${publisher}/jdataset.py -d ${ncml} -o variable_col=variable_id -o eva_version="${version}" -o creation="${creation}" -t templates/cmip6.ncml.j2 ${pickle}
     rm -f "${pickle}"
 done
