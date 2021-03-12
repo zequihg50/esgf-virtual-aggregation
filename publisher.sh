@@ -5,7 +5,7 @@ set -u
 trap exit SIGINT SIGKILL
 
 # defaults
-columns=OPENDAP,size,replica,version,checksum,checksum_type,_eva_ensemble_aggregation,_eva_variable_aggregation
+columns=OPENDAP,index_node,data_node,size,replica,version,retracted,_timestamp,_version_,checksum,checksum_type,_eva_ensemble_aggregation,_eva_variable_aggregation,_eva_no_frequency
 overwrite=0
 ncmls=content/public
 pickles=pickles
@@ -56,6 +56,12 @@ done
 
 mkdir -p ${pickles} ${ncmls}
 
+# log to avoid generating already existing ncmls
+logp=logp
+if [ ! -f ${logp} ] ; then
+    touch ${logp}
+fi
+
 if [ -z "${sources}" ] ; then
     cat <&0
 else
@@ -63,16 +69,21 @@ else
 fi | while read csv
 do
     basename=${csv##*/}
-    ncml=${ncmls}/${basename}.ncml
+    pickle=${pickles}/${basename}
 
-    # If ncml exists, ignore
-    if [ -f "${ncml}" ] && [ "${overwrite}" -eq 0 ] ; then
-        echo "Ignoring ${ncml}..." >&2
+    # If pickle is processed and overwrite set to false, ignore
+    if grep -F -q "${basename}" ${logp} && [ "${overwrite}" -eq 0 ] ; then
+        echo "Ignoring ${basename}..." >&2
     elif [ ! -s "${csv}" ] ; then
         echo "Size0 ${csv}..." >&2
     else
-        python -W ignore ${publisher}/todf.py -f ${csv} --numeric size -v time --col 0 --cols ${columns} ${pickles}/${basename}
-        echo ${pickles}/${basename} >&2
+        python -W ignore ${publisher}/todf.py -f ${csv} --numeric size -v time --col 0 --cols ${columns} ${pickle}
+
+        # log
+        echo ${pickle} >&2
+        if ! grep -F -q "${basename}" ${logp} ; then
+            echo "${basename}" >> ${logp}
+        fi
     fi
 done | while read pickle
 do
@@ -81,7 +92,7 @@ done | while read pickle
 do
     version="v$(date -u +%Y%m%d)"
     creation="$(date -u +%FT%T)Z"
-    ncml="${ncmls}/{mip_era}/{institution_id}/${version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{table_id}_{grid_label}_v{version}.ncml"
+    ncml="${ncmls}/{mip_era}/{institution_id}/${version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_v{version}.ncml"
     python ${publisher}/jdataset.py -d ${ncml} -o variable_col=variable_id -o eva_version=${version} -o creation=${creation} -t templates/cmip6.ncml.j2 ${pickle}
     #rm -f "${pickle}"
 done

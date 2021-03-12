@@ -3,7 +3,10 @@
                 'frequency', 'grid', 'grid_label', 'initialization_index', 'institution', 'institution_id', 'license',
                 'mip_era', 'nominal_resolution', 'physics_index', 'product', 'realization_index', 'realm',
                 'source', 'source_id', 'source_type', 'sub_experiment', 'sub_experiment_id', 'table_id',
-                'variable_id', 'variant_label'] %}
+                'variable_id', 'variant_label', 'cmor_version'] %}
+{% set no_parent_attrs = ['branch_method', 'parent_activity_id', 'parent_experiment_id', 'parent_mip_era',
+                          'parent_source_id', 'parent_time_units', 'parent_variant_label'] %}
+{% set omit_attrs = ['branch_time_in_child', 'branch_time_in_parent'] %}
 <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
     <explicit/>
 
@@ -27,6 +30,21 @@
     <attribute name="{{ attr }}" value=""/>
     {% endif %}
     {% endfor %}
+    <!-- attributes that default to "no parent" if they don't exist -->
+    {% for attr in no_parent_attrs %}
+    {% if ('GLOBALS', attr) in df.columns and not (df[('GLOBALS', attr)].isna().all()) %}
+    <attribute name="{{ attr }}" value="{{ (df[('GLOBALS', attr)].dropna().iloc[0])|replace('\n', ' ') }}"/>
+    {% else %}
+    <attribute name="{{ attr }}" value="no parent"/>
+    {% endif %}
+    {% endfor %}
+    <!-- attributes that are omitted if they don't exist -->
+    {% for attr in omit_attrs %}
+    {% if ('GLOBALS', attr) in df.columns and not (df[('GLOBALS', attr)].isna().all()) %}
+    <attribute name="{{ attr }}" value="{{ (df[('GLOBALS', attr)].dropna().iloc[0])|replace('\n', ' ') }}"/>
+    {% endif %}
+    {% endfor %}
+
     <attribute name="further_info_url" value="See netCDF variable 'further_info_url'"/>
     <attribute name="creation_date" value="{{ creation }}"/>
     <attribute name="version" value="v{{ df[('GLOBALS', 'version')].iloc[0] }}"/>
@@ -59,32 +77,40 @@
                  <netcdf>
                      {% if variable_group[('GLOBALS', '_modified_time_coord')].any() %}
                      <dimension name="time_{{ variable }}" orgName="time"/>
-                     <variable name="time_{{ variable }}" orgName="time"/>
+                     <variable name="time_{{ variable }}" orgName="time">
+                        <attribute name="_CoordinateAxisType" value="Time"/>
+                     </variable>
+                     <variable name="{{ variable }}" shape="{{ variable_group[(variable, '_dimensions')].dropna().iloc[0]|replace(',', ' ') }}">
+                        <attribute name="_CoordinateAxes" value="{{ variable_group[(variable, '_dimensions')].dropna().iloc[0]|replace(',', ' ') }}"/>
+                         {% if (variable, 'coordinates') in variable_group.columns and (not variable_group[(variable, 'coordinates')].isna().all()) %}
+                         <attribute name="coordinates" value="{{ variable_group[(variable, 'coordinates')].dropna().iloc[0]|replace(',', ' ') }}"/>
+                         {% endif %}
+                     </variable>
                      {% endif %}
                      <aggregation type="joinExisting" dimName="time">
-                         {% for _,i in variable_group.sort_values(by=[('GLOBALS', 'localpath')]).iterrows() %}
+                         {% for _,i in variable_group.sort_values(by=[('GLOBALS', 'OPENDAP')]).iterrows() %}
                          {% if i[('GLOBALS', '_modified_time_coord')] %}
-                         <netcdf location="{{ i[('GLOBALS', 'localpath')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}">
+                         <netcdf location="{{ i[('GLOBALS', 'OPENDAP')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}">
                             <variable name="time">
                                 <attribute name="units" value="{{ i[('time', 'units')] }}"/>
                                 <attribute name="calendar" value="{{ i[('time', 'calendar')] }}"/>
-                                <values>i[('time', '_values')]|join(' ')</values>
+                                <!--<values>{{ i[('time', '_values')]|join(' ') }}</values>-->
                             </variable>
-                            <variable name="{{ variable }}" shape="{{ i[('_'.join(['_d', variable]), 'coordinates')]|replace(',', ' ') }}">
-                                {% if (variable, 'coordinates') in i.index and i[(variable, 'coordinates')] %}
-                                <attribute name="coordinates" value="{{ i[(variable, 'coordinates')]|replace(',', ' ') }}"/>
+                            <variable name="{{ variable }}">
+                                {% if (variable, 'cell_methods') in i.index and i[(variable, 'cell_methods')] %}
+                                <attribute name="cell_methods" value="{{ i[(variable, 'cell_methods')] }}"/>
                                 {% endif %}
                             </variable>
                          </netcdf>
                          {% else %}
-                         <netcdf location="{{ i[('GLOBALS', 'localpath')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}"/>
+                         <netcdf location="{{ i[('GLOBALS', 'OPENDAP')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}"/>
                          {% endif %}
                          {% endfor %}
                      </aggregation>
                  </netcdf>
             {% endfor %}
             {% for _,fx in ensemble_group[ensemble_group[('GLOBALS', 'frequency')] == 'fx'].iterrows() %}
-                <netcdf location="{{ fx[('GLOBALS', 'localpath')].rstrip('\n') }}"/>
+                <netcdf location="{{ fx[('GLOBALS', 'OPENDAP')].rstrip('\n') }}"/>
             {% endfor %}
             </aggregation>
         </netcdf>

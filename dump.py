@@ -6,7 +6,7 @@ def parse_args(argv):
     args = {
         'from': None,
         'dest': None,
-        'fields': ['OPENDAP','size','replica','version','checksum','checksum_type','_eva_ensemble_aggregation','_eva_variable_aggregation','_eva_no_frequency'],
+        'fields': ['OPENDAP','index_node','data_node','size','replica','version','retracted','_timestamp','_version_','checksum','checksum_type','_eva_ensemble_aggregation','_eva_variable_aggregation','_eva_no_frequency'],
         'frequency': 'frequency',
         'overwrite': False,
         'step': 100000,
@@ -54,7 +54,7 @@ for i in range(len(t)//step + 1):
 a = np.array(list(s))
 for agg in a[a != b'']:
     dest = os.path.join(args['dest'], agg.decode('utf-8'))
-    if os.path.exists(dest) and not args['overwrite']:
+    if os.path.exists(dest) and (not args['overwrite']) and os.stat(dest).st_size != 0:
         continue
 
     # find current aggregation files and corresponding fxs

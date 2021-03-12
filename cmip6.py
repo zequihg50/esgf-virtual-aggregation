@@ -5,6 +5,10 @@ import pandas as pd
 source = os.path.abspath(sys.argv[1])
 df = pd.read_pickle(source)
 
+# llnl requires https in OPENDAP URLs
+subset = df[('GLOBALS', 'data_node')] == 'aims3.llnl.gov'
+df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].str.replace('^http://', 'https://')
+
 # fix time values
 df[('GLOBALS', '_modified_time_coord')] = False
 for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLOBALS', 'variable_id') ):
@@ -26,6 +30,8 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
         df.loc[vargroup.index, ('GLOBALS', '_modified_time_coord')] = True
         df.loc[vargroup.index, ('time', 'calendar')] = reference_calendar
         df.loc[vargroup.index, ('time', 'units')] = reference_units
+        df.loc[vargroup.index, (varname, '_dimensions')] = \
+            df.loc[vargroup.index, (varname, '_dimensions')].str.replace(r'\btime\b', '_'.join(['time', varname]))
 
         if ('_d_time', 'name') in df.columns:
             df.loc[vargroup.index, ('_d_time', 'name')] = '_'.join(['time', varname])
@@ -33,6 +39,10 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
         if (varname, 'coordinates') in df.columns:
             df.loc[vargroup.index, (varname, 'coordinates')] = \
                 df.loc[vargroup.index, (varname, 'coordinates')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+
+        if (varname, 'cell_methods') in df.columns:
+            df.loc[vargroup.index, (varname, 'cell_methods')] = \
+                df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]))
 
 df.to_pickle(source)
 
