@@ -11,9 +11,9 @@ facets='_timestamp,_version_,activity_id,checksum,checksum_type,citation_url,dat
 
 curl -s "http://esgf-data.dkrz.de/${search_facets}" | \
 jq -r ".facet_counts.facet_fields.${subfield}|map(strings)[]" | \
-while read variable
+while read value
 do
-  esgf-utils/esgf-search -q "project=CMIP6 type=File variable_id=${variable}" | jq/cmip6.sh
+  esgf-utils/esgf-search -q "project=CMIP6 type=File ${subfield}=${value}" | jq/cmip6.sh
 done | python store.py --facets "${facets}" cmip6.hdf
 
 # CORDEX
