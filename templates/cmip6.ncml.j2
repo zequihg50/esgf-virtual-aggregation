@@ -92,12 +92,10 @@
                                 {% if (variable, 'cell_methods') in i.index and i[(variable, 'cell_methods')] %}
                                 <attribute name="cell_methods" value="{{ i[(variable, 'cell_methods')] }}"/>
                                 {% endif %}
-                                {# NEED TO UNDERSTAND THIS #}
                                 {% if (variable, 'coordinates') in i.index and i[(variable, 'coordinates')] %}
                                 <attribute name="coordinates" value="{{ i[(variable, 'coordinates')]|replace(',', ' ') }}"/>
-                                {% else %}
-                                <attribute name="_CoordinateAxes" value="{{ i[(variable, '_dimensions')]|replace(',', ' ') }}"/>
                                 {% endif %}
+                                <attribute name="_CoordinateAxes" value="{{ i[('GLOBALS', '_CoordinateAxes')]|replace(',', ' ') }}"/>
                             </variable>
                          </netcdf>
                          {% endfor %}

@@ -11,6 +11,7 @@ df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].
 
 # fix time values per variable
 df[('GLOBALS', '_modified_time_coord')] = False
+df[('GLOBALS', '_CoordinateAxes')] = None
 for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLOBALS', 'variable_id') ):
     # always create a time coordinate per variable
     df.loc[vargroup.index, (varname, '_dimensions')] = \
@@ -26,6 +27,11 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
     if (varname, 'cell_methods') in df.columns:
         df.loc[vargroup.index, (varname, 'cell_methods')] = \
             df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]), regex=True)
+
+    # explicitly declare _CoordinateAxes for netcdf-java
+    coords = [(varname, 'coordinates'), (varname, '_dimensions')]
+    df.loc[vargroup.index, ('GLOBALS', '_CoordinateAxes')] = df.loc[vargroup.index, coords].fillna('').agg(
+        lambda x: ','.join([y for y in x if y != '']), axis=1)
 
     # modify time values if units or calendar change along the time series
     if (len(vargroup[('time', 'units')].unique()) > 1 or
@@ -45,7 +51,6 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
         df.loc[vargroup.index, ('time', 'calendar')] = reference_calendar
         df.loc[vargroup.index, ('time', 'units')] = reference_units
         df.loc[vargroup.index, ('GLOBALS', '_modified_time_coord')] = True
-
 
 df.to_pickle(source)
 
