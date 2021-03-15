@@ -52,14 +52,14 @@ cmip6_dataset() {
     echo ''
 }
 
-# $1 catalog
+# $1 catalog file
+# $2 title
+# $3 href
 ref() {
-    href=${1##*/}
-    title=${href%.xml}
     size=$(awk '/<dataSize/{gsub("[^0-9]", ""); total+=$0}END{print total}' ${1})
     modified=$(stat --format=%y ${1})
 
-    echo '  <catalogRef xlink:title="'"${title}"'" xlink:href="'${href}'" name="">'
+    echo '  <catalogRef xlink:title="'"${2}"'" xlink:href="'${3}'" name="">'
     echo '    <dataSize units="bytes">'"${size}"'</dataSize>'
     echo '    <date type="modified">'"${modified}"'</date>'
     echo '  </catalogRef>'
@@ -112,21 +112,31 @@ mkdir -p ${root_catalogs}/ensemble/CMIP6
 init_catalog "EVAEnsemble_CMIP6" >${project_catalog}
 find ${ncmls} -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | while read institute
 do
-    catalog=${root_catalogs}/ensemble/CMIP6/${institute}.xml
-    init_catalog "EVAEnsemble_CMIP6_${institute}" >${catalog}
+    mkdir -p ${root_catalogs}/ensemble/CMIP6/${institute}
+    institute_catalog=${root_catalogs}/ensemble/CMIP6/${institute}/catalog.xml
+    init_catalog "EVAEnsemble_CMIP6_${institute}" >${institute_catalog}
 
     # group by "masterid" (a master id contains all EVA versions, all data nodes and all ESGF versions of a dataset)
     find ${ncmls}/${institute} -type f -name '*.ncml' -printf '%f\n' | cut -d_ -f1-9 | sort -uV | while read masterid
     do
+        catalog=${root_catalogs}/ensemble/CMIP6/${institute}/${masterid}.xml
+
+        init_catalog "EVAEnsemble_CMIP6_${institute}_${masterid}" >${catalog}
         find ${ncmls}/${institute} -type f -name '*.ncml' | grep ${masterid} | sort -V | cmip6_dataset ${masterid} >>${catalog}
+        echo '</catalog>' >>${catalog}
+
+        href=${catalog##*/}
+        title=${href%.xml}
+        ref "${catalog}" "${title}" "${href}" >>${institute_catalog}
+        echo ${catalog}
     done
-    echo '</catalog>' >>${catalog}
+    echo '</catalog>' >>${institute_catalog}
 
     # reference from parent catalog
-    ref ${catalog} >>${project_catalog}
-
-    # print created catalog
-    echo ${catalog}
+    href=${institute}/catalog.xml
+    title=${institute}
+    ref "${institute_catalog}" "${title}" "${href}" >>${project_catalog}
+    echo ${institute_catalog}
 done
 echo '</catalog>' >>${project_catalog}
 echo ${project_catalog}
