@@ -8,6 +8,7 @@ def parse_args(argv):
         'dest': None,
         'fields': ['OPENDAP','index_node','data_node','size','replica','version','retracted','_timestamp','_version_','checksum','checksum_type','_eva_ensemble_aggregation','_eva_variable_aggregation','_eva_no_frequency'],
         'frequency': 'frequency',
+        'limit': None,
         'overwrite': False,
         'step': 100000,
     }
@@ -26,6 +27,9 @@ def parse_args(argv):
             position+=2
         elif argv[position] == '--frequency':
             args['frequency'] = argv[position+1]
+            position+=2
+        elif argv[position] == '-l' or argv[position] == '--limit':
+            args['limit'] = int(argv[position+1])
             position+=2
         elif argv[position] == '--overwrite':
             args['overwrite'] = True
@@ -51,6 +55,7 @@ s = set()
 for i in range(len(t)//step + 1):
     s.update( t.colindexes['_eva_ensemble_aggregation'].read_sorted(i*step, i*step+step) )
 
+total = 0
 for agg in sorted(filter(lambda x: x != b'', s)):
     dest = os.path.join(args['dest'], agg.decode('utf-8'))
     if os.path.exists(dest) and (not args['overwrite']) and os.stat(dest).st_size != 0:
@@ -71,6 +76,17 @@ for agg in sorted(filter(lambda x: x != b'', s)):
         if fields != '' and len(match['OPENDAP']) > 0:
             print(fields, file=fh)
     fh.close()
-    print(dest)
+
+    # If no rows have been written, remove file
+    if os.stat(dest).st_size != 0:
+        total += 1
+        print(dest)
+    else:
+        os.remove(dest)
+
+    # Stop if reached user's limit
+    if args['limit'] is not None:
+        if total == args['limit']:
+            break
 
 f.close()

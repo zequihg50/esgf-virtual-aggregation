@@ -7,26 +7,25 @@ df = pd.read_pickle(source)
 
 # llnl requires https in OPENDAP URLs
 subset = df[('GLOBALS', 'data_node')] == 'aims3.llnl.gov'
-df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].str.replace('^http://', 'https://')
-
+df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].str.replace('^http://', 'https://', regex=True)
 
 # fix time values per variable
 df[('GLOBALS', '_modified_time_coord')] = False
 for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLOBALS', 'variable_id') ):
     # always create a time coordinate per variable
     df.loc[vargroup.index, (varname, '_dimensions')] = \
-        df.loc[vargroup.index, (varname, '_dimensions')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+        df.loc[vargroup.index, (varname, '_dimensions')].str.replace(r'\btime\b', '_'.join(['time', varname]), regex=True)
 
     if ('_d_time', 'name') in df.columns:
         df.loc[vargroup.index, ('_d_time', 'name')] = '_'.join(['time', varname])
 
     if (varname, 'coordinates') in df.columns:
         df.loc[vargroup.index, (varname, 'coordinates')] = \
-            df.loc[vargroup.index, (varname, 'coordinates')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+            df.loc[vargroup.index, (varname, 'coordinates')].str.replace(r'\btime\b', '_'.join(['time', varname]), regex=True)
 
     if (varname, 'cell_methods') in df.columns:
         df.loc[vargroup.index, (varname, 'cell_methods')] = \
-            df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]))
+            df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]), regex=True)
 
     # modify time values if units or calendar change along the time series
     if (len(vargroup[('time', 'units')].unique()) > 1 or

@@ -9,16 +9,6 @@ root_ncmls=${content}/public/EVA
 root_catalogs=${content}/EVA
 root_catalog=${catalogs}/catalog.xml
 
-# $1 ncml
-cmip6_dataset() {
-    name=${1##*/}
-    name=${name%.ncml}
-    urlPath=EVA/ensemble/CMIP6/${name}
-    id=${urlPath}
-    size=$(awk '/<attribute name="size"/{gsub("[^0-9]", ""); print; exit}' ${1})
-    modified=$(stat --format=%y ${1})
-    location=content/EVA/${1##*public/EVA/}
-
 #{% set attrs = ['activity_id', 'Conventions', 'data_specs_version', 'experiment', 'experiment_id', 'forcing_index',
 #                'frequency', 'grid', 'grid_label', 'initialization_index', 'institution', 'institution_id', 'license',
 #                'mip_era', 'nominal_resolution', 'physics_index', 'product', 'realization_index', 'realm',
@@ -27,17 +17,37 @@ cmip6_dataset() {
 #{% set no_parent_attrs = ['branch_method', 'parent_activity_id', 'parent_experiment_id', 'parent_mip_era',
 #                          'parent_source_id', 'parent_time_units', 'parent_variant_label'] %}
 #{% set omit_attrs = ['branch_time_in_child', 'branch_time_in_parent'] %}
+# $1 ncml
+cmip6_dataset() {
+    prefix=EVA/ensemble/CMIP6
 
-    echo '  <dataset name="'${name}'"'
-    echo '      ID="'${id}'"'
-    echo '      urlPath="'${urlPath}'">'
-    echo '    <metadata inherited="true">'
-    echo '      <serviceName>virtual</serviceName>'
-    echo '      <dataSize units="bytes">'"${size}"'</dataSize>'
-    echo '      <date type="modified">'"${modified}"'</date>'
-    echo '    </metadata>'
-    echo '    <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"'
-    echo '            location="'${location}'" />'
+    echo '  <dataset name="'${1}'" ID="'${prefix}/${1}'">'
+    while read ncml
+    do
+        name=${ncml##*/}
+        name=${name%.ncml}
+        urlPath=${prefix}/${name}
+        id=${urlPath}
+        size=$(awk '/<attribute name="size"/{gsub("[^0-9]", ""); print; exit}' ${ncml})
+        modified=$(stat --format=%y ${ncml})
+        location=content/EVA/${ncml##*public/EVA/}
+
+        # ncml attributes
+        replica=$(awk '/<attribute name="replica"/{sub(".*value=\"", ""); sub("\".*", ""); print; exit}' ${ncml})
+
+        echo '    <dataset name="'${name}'"'
+        echo '        ID="'${id}'"'
+        echo '        urlPath="'${urlPath}'">'
+        echo '      <metadata inherited="true">'
+        echo '        <serviceName>virtual</serviceName>'
+        echo '        <dataSize units="bytes">'"${size}"'</dataSize>'
+        echo '        <date type="modified">'"${modified}"'</date>'
+        echo '      </metadata>'
+        echo '      <property name="replica" value="'${replica}'"/>'
+        echo '      <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"'
+        echo '              location="'${location}'" />'
+        echo '    </dataset>'
+    done
     echo '  </dataset>'
     echo ''
 }
@@ -104,9 +114,11 @@ find ${ncmls} -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | while read instit
 do
     catalog=${root_catalogs}/ensemble/CMIP6/${institute}.xml
     init_catalog "EVAEnsemble_CMIP6_${institute}" >${catalog}
-    find ${ncmls}/${institute} -type f -name '*.ncml' | sort -V | while read ncml
+
+    # group by "masterid" (a master id contains all EVA versions, all data nodes and all ESGF versions of a dataset)
+    find ${ncmls}/${institute} -type f -name '*.ncml' -printf '%f\n' | cut -d_ -f1-9 | sort -uV | while read masterid
     do
-        cmip6_dataset ${ncml} >>${catalog}
+        find ${ncmls}/${institute} -type f -name '*.ncml' | grep ${masterid} | sort -V | cmip6_dataset ${masterid} >>${catalog}
     done
     echo '</catalog>' >>${catalog}
 
@@ -118,22 +130,3 @@ do
 done
 echo '</catalog>' >>${project_catalog}
 echo ${project_catalog}
-
-
-
-
-#init_catalog EVA-CMIP6 > ${cmip6}
-#find ${ncmls} -type f | sort -V | while read ncml
-#do
-#  name=${ncml##*/}
-#  name=${name%.ncml}
-#  urlPath=devel/EVA/variable-aggregation/${name}
-#  id=${urlPath}
-#  size=0
-#  last_modified=$(stat --format=%y ${ncml})
-#  location=content/${ncml##*public/}
-#  
-#  dataset1 "${name}" "${id}" "${urlPath}" "${size}" "${last_modified}" "${location}" >> ${cmip6}
-#done
-#echo '</catalog>' >> ${cmip6}
-#echo ${cmip6}

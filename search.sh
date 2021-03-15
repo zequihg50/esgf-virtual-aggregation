@@ -16,12 +16,12 @@ do
   esgf-utils/esgf-search -q "project=CMIP6 type=File ${subfield}=${value}" | jq/cmip6.sh
 done | python store.py --facets "${facets}" cmip6.hdf
 
-# CORDEX
-facets='_timestamp,_version_,cf_standard_name,checksum,checksum_type,data_node,dataset_id,domain,driving_model,ensemble,experiment,experiment_family,id,index_node,instance_id,institute,latest,master_id,product,project,rcm_name,rcm_version,replica,retracted,score,size,time_frequency,timestamp,title,tracking_id,type,url,variable,variable_long_name,variable_units,version'
-
-while read i
-do
-    esgf-utils/esgf-search -i "${i}" -q "project=CORDEX type=File distrib=False" | jq/cordex.sh
-done < esgf-utils/indexnodes | python store.py --facets "${facets}" cordex.hdf
-
-# CMIP5
+## CORDEX
+#facets='_timestamp,_version_,cf_standard_name,checksum,checksum_type,data_node,dataset_id,domain,driving_model,ensemble,experiment,experiment_family,id,index_node,instance_id,institute,latest,master_id,product,project,rcm_name,rcm_version,replica,retracted,score,size,time_frequency,timestamp,title,tracking_id,type,url,variable,variable_long_name,variable_units,version'
+#
+#while read i
+#do
+#    esgf-utils/esgf-search -i "${i}" -q "project=CORDEX type=File distrib=False" | jq/cordex.sh
+#done < esgf-utils/indexnodes | python store.py --facets "${facets}" cordex.hdf
+#
+## CMIP5

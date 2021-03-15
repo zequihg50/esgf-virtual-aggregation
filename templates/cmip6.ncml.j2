@@ -48,6 +48,7 @@
     <attribute name="further_info_url" value="See netCDF variable 'further_info_url'"/>
     <attribute name="creation_date" value="{{ creation }}"/>
     <attribute name="version" value="v{{ df[('GLOBALS', 'version')].iloc[0] }}"/>
+    <attribute name="replica" value="{{ df[('GLOBALS', 'replica')].iloc[0]|lower }}"/>
 
     <dimension name="nfiles" length="{{ df|length }}"/>
     {% if ('GLOBALS', 'further_info_url') in df.columns %}

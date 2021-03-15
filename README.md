@@ -39,7 +39,7 @@ Columns for CORDEX:
 
 `./search.sh` - Comment lines for projects you want to ignore. Take into account that for CMIP6 this takes a couple of days.
 `python dump.py [--overwrite]` - Generate CSV files for datasets.
-`./publisher.sh` - Generate NcMLs from input files generated from `dump.py`.
+`./ncmls.sh` - Generate NcMLs from input files generated from `dump.py`.
 
 I use a job script like the following:
 
