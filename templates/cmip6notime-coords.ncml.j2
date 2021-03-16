@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-{% set attrs = ['activity_id', 'Conventions', 'data_specs_version', 'experiment', 'experiment_id', 'forcing_index',
-                'frequency', 'grid', 'grid_label', 'initialization_index', 'institution', 'institution_id', 'license',
-                'mip_era', 'nominal_resolution', 'physics_index', 'product', 'realization_index', 'realm',
-                'source', 'source_id', 'source_type', 'sub_experiment', 'sub_experiment_id', 'table_id',
-                'variable_id', 'variant_label', 'cmor_version'] %}
-{% set no_parent_attrs = ['branch_method', 'parent_activity_id', 'parent_experiment_id', 'parent_mip_era',
-                          'parent_source_id', 'parent_time_units', 'parent_variant_label'] %}
-{% set omit_attrs = ['branch_time_in_child', 'branch_time_in_parent'] %}
+{% set Apressure = ["cl", "ta", "ua", "va", "hus", "wap", "zg", "hur"] %}
+{% set attrs = ["activity_id", "Conventions", "data_specs_version", "experiment", "experiment_id", "forcing_index",
+                "frequency", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license",
+                "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "realm",
+                "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id",
+                "variable_id", "variant_label", "cmor_version"] %}
+{% set no_parent_attrs = ["branch_method", "parent_activity_id", "parent_experiment_id", "parent_mip_era",
+                          "parent_source_id", "parent_time_units", "parent_variant_label"] %}
+{% set omit_attrs = ["branch_time_in_child", "branch_time_in_parent"] %}
 <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
     <explicit/>
 
@@ -76,27 +77,24 @@
             <aggregation type="union">
             {% for variable,variable_group in ensemble_group[ensemble_group[('GLOBALS', 'frequency')] != 'fx'].groupby(('GLOBALS', 'variable_id')) %}
                  <netcdf>
-                     <aggregation type="joinExisting" dimName="time_{{ variable }}">
+                     <dimension name="time" size="60266" />
+                     <variable name="time">
+                         <attribute name="units" value="days since 1850-01-01 00:00:00" />
+                         <values start="0" increment="1" />
+                     </variable>
+                     <aggregation type="joinExisting" dimName="time">
                          {% for _,i in variable_group.sort_values(by=[('GLOBALS', 'opendap')]).iterrows() %}
-                         <netcdf location="{{ i[('GLOBALS', 'opendap')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}">
-                            <dimension name="time_{{ variable }}" orgName="time"/>
-                            <variable name="time_{{ variable }}" orgName="time">
-                                <attribute name="_CoordinateAxisType" value="Time"/>
-                                <attribute name="units" value="{{ i[('time', 'units')] }}"/>
-                                <attribute name="calendar" value="{{ i[('time', 'calendar')] }}"/>
-                                {% if (variable_group[('time', 'units')].unique())|length > 1 %}
-                                <values>{{ i[('time', '_values')]|join(' ') }}</values>
-                                {% endif %}
-                            </variable>
-                            <variable name="{{ variable }}" shape="{{ i[(variable, '_dimensions')]|replace(',', ' ')|replace('time', '_'.join(['time', variable])) }}">
-                                {% if (variable, 'cell_methods') in i.index and i[(variable, 'cell_methods')] %}
-                                <attribute name="cell_methods" value="{{ i[(variable, 'cell_methods')] }}"/>
-                                {% endif %}
-                                {% if (variable, 'coordinates') in i.index and i[(variable, 'coordinates')] %}
-                                <attribute name="coordinates" value="{{ i[(variable, 'coordinates')]|replace(',', ' ') }}"/>
-                                {% endif %}
-                                <attribute name="_CoordinateAxes" value="{{ i[('GLOBALS', '_CoordinateAxes')]|replace(',', ' ') }}"/>
-                            </variable>
+                         <netcdf location="{{ i[('GLOBALS', 'opendap')].rstrip('\n') }}" ncoords="366">
+                             <variable name="time">
+                                 <attribute name="_CoordinateAxis" value="Time" />
+                             </variable>
+                             <variable name="{{ variable }}">
+                                 {% if variable in Apressure %}
+                                 <attribute name="_CoordinateAxes" value="variant_label time lat lon plev" />
+                                 {% else %}
+                                 <attribute name="_CoordinateAxes" value="variant_label time lat lon" />
+                                 {% endif %}
+                             </variable>
                          </netcdf>
                          {% endfor %}
                      </aggregation>

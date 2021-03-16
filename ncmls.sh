@@ -101,7 +101,7 @@ do
 done | while read pickle
 do
     creation="$(date -u +%FT%T)Z"
-    ncml="${ncmls}/ensemble/{mip_era}/{institution_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{frequency}_{realm}_{grid_label}_${version}_{data_node}_v{version}.ncml"
+    ncml="${ncmls}/ensemble/CMIP6/{institution_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{frequency}_{realm}_{grid_label}_{data_node}_v{version}_EVAEnsemble${version}.ncml"
     python ${publisher}/jdataset.py -d ${ncml} -o variable_col=variable_id -o eva_version="${version}" -o creation="${creation}" -t templates/cmip6.ncml.j2 ${pickle}
-    #rm -f "${pickle}"
+    rm -f "${pickle}"
 done

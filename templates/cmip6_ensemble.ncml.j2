@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-{% set attrs = ['activity_id', 'Conventions', 'data_specs_version', 'experiment', 'experiment_id', 'forcing_index',
-                'frequency', 'grid', 'grid_label', 'initialization_index', 'institution', 'institution_id', 'license',
-                'mip_era', 'nominal_resolution', 'physics_index', 'product', 'realization_index', 'realm',
-                'source', 'source_id', 'source_type', 'sub_experiment', 'sub_experiment_id', 'table_id',
-                'variable_id', 'variant_label', 'cmor_version'] %}
-{% set no_parent_attrs = ['branch_method', 'parent_activity_id', 'parent_experiment_id', 'parent_mip_era',
-                          'parent_source_id', 'parent_time_units', 'parent_variant_label'] %}
-{% set omit_attrs = ['branch_time_in_child', 'branch_time_in_parent'] %}
+{% set attrs = ["activity_id", "Conventions", "data_specs_version", "experiment", "experiment_id", "forcing_index",
+                "frequency", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license",
+                "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "realm",
+                "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id",
+                "cmor_version"] %}
+{% set no_parent_attrs = ["branch_method", "parent_activity_id", "parent_experiment_id", "parent_mip_era",
+                          "parent_source_id", "parent_time_units", "parent_variant_label"] %}
+{% set omit_attrs = ["branch_time_in_child", "branch_time_in_parent"] %}
 <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
     <explicit/>
 
@@ -14,7 +14,7 @@
     <attribute name="__license__" value="This is a derived dataset product from ESGF, same licenses from original datasets apply for this dataset."/>
     <attribute name="__eva_version__" value="{{ eva_version }}"/>
 
-    <attribute name="primary_variables" value="{{ (df[('GLOBALS', 'variable_id')].unique())|join(',') }}"/>
+    <attribute name="variable_id" value="{{ (df[('GLOBALS', 'variable_id')].unique())|join(',') }}"/>
     <attribute name="size" type="int" value="{{ df[('GLOBALS', 'size')].sum()|int }}"/>
     <attribute name="size_human" value="{{ df[('GLOBALS', 'size')].sum()|filesizeformat }}"/>
 
@@ -37,6 +37,8 @@
     {% else %}
     <attribute name="{{ attr }}" value="no parent"/>
     {% endif %}
+    <remove type="attribute" name="variant_label"/>
+    <remove type="attribute" name="tracking_id"/>
     {% endfor %}
     <!-- attributes that are omitted if they don't exist -->
     {% for attr in omit_attrs %}
@@ -47,17 +49,18 @@
 
     <attribute name="further_info_url" value="See netCDF variable 'further_info_url'"/>
     <attribute name="creation_date" value="{{ creation }}"/>
-    <attribute name="version" value="v{{ df[('GLOBALS', 'version')].iloc[0] }}"/>
+    <attribute name="version" value="{{ df[('GLOBALS', 'version')].iloc[0] }}"/>
     <attribute name="replica" value="{{ df[('GLOBALS', 'replica')].iloc[0]|lower }}"/>
 
+    <dimension name="eva_property" length="2"/>
     <dimension name="nfiles" length="{{ df|length }}"/>
     {% if ('GLOBALS', 'further_info_url') in df.columns %}
-    <variable name="further_info_url" type="string" shape="nfiles 2">
+    <variable name="further_info_url" type="string" shape="nfiles eva_property">
         <values>{{ (df[[('GLOBALS', 'opendap'), ('GLOBALS', 'further_info_url')]].agg(' '.join, axis=1))|join(' ') }}</values>
     </variable>
     {% endif %}
     {% if ('GLOBALS', 'tracking_id') in df.columns %}
-    <variable name="tracking_id" type="string" shape="nfiles 2">
+    <variable name="tracking_id" type="string" shape="nfiles eva_property">
         <values>{{ (df[[('GLOBALS', 'opendap'), ('GLOBALS', 'tracking_id')]].fillna("").agg(' '.join, axis=1))|join(' ') }}</values>
     </variable>
     {% endif %}
@@ -76,28 +79,9 @@
             <aggregation type="union">
             {% for variable,variable_group in ensemble_group[ensemble_group[('GLOBALS', 'frequency')] != 'fx'].groupby(('GLOBALS', 'variable_id')) %}
                  <netcdf>
-                     <aggregation type="joinExisting" dimName="time_{{ variable }}">
+                     <aggregation type="joinExisting" dimName="time">
                          {% for _,i in variable_group.sort_values(by=[('GLOBALS', 'opendap')]).iterrows() %}
-                         <netcdf location="{{ i[('GLOBALS', 'opendap')].rstrip('\n') }}" ncoords="{{ i[('_d_time', 'size')]|int }}">
-                            <dimension name="time_{{ variable }}" orgName="time"/>
-                            <variable name="time_{{ variable }}" orgName="time">
-                                <attribute name="_CoordinateAxisType" value="Time"/>
-                                <attribute name="units" value="{{ i[('time', 'units')] }}"/>
-                                <attribute name="calendar" value="{{ i[('time', 'calendar')] }}"/>
-                                {% if (variable_group[('time', 'units')].unique())|length > 1 %}
-                                <values>{{ i[('time', '_values')]|join(' ') }}</values>
-                                {% endif %}
-                            </variable>
-                            <variable name="{{ variable }}" shape="{{ i[(variable, '_dimensions')]|replace(',', ' ')|replace('time', '_'.join(['time', variable])) }}">
-                                {% if (variable, 'cell_methods') in i.index and i[(variable, 'cell_methods')] %}
-                                <attribute name="cell_methods" value="{{ i[(variable, 'cell_methods')] }}"/>
-                                {% endif %}
-                                {% if (variable, 'coordinates') in i.index and i[(variable, 'coordinates')] %}
-                                <attribute name="coordinates" value="{{ i[(variable, 'coordinates')]|replace(',', ' ') }}"/>
-                                {% endif %}
-                                <attribute name="_CoordinateAxes" value="{{ i[('GLOBALS', '_CoordinateAxes')]|replace(',', ' ') }}"/>
-                            </variable>
-                         </netcdf>
+                         <netcdf location="{{ i[('GLOBALS', 'opendap')].rstrip('\n') }}" />
                          {% endfor %}
                      </aggregation>
                  </netcdf>
