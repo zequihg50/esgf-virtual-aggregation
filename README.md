@@ -14,7 +14,7 @@ The EVA works as follows:
 
 4 - Provide multiple virtual views of the datasets:
   - ESGF dataset - Aggregate time series for variables.
-  - Ensemble aggregation - Aggregate time series and ensembles into a single dataset.
+  - ESGF ensemble - Aggregate time series and ensembles into a single dataset.
 
 ## Usage
 
