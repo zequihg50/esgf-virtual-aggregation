@@ -261,12 +261,20 @@ class Query:
 
 
 class ExtensiveQuery(Query):
-    def __init__(self, project):
+    def __init__(self, project, frm=None, to=None):
         self.project = project
+        self.frm = frm
+        self.to = to
 
     def query(self):
         for q in project.get_datanode_variable_pairs():
-            yield q
+            qcopy = q.copy()
+            if self.frm:
+                qcopy["from"] = self.frm
+            if self.to:
+                qcopy["to"] = self.to
+
+            yield qcopy
 
 
 class SelectionQuery(Query):
@@ -319,6 +327,16 @@ if __name__ == "__main__":
                         required=False,
                         default=None,
                         help="selection file.")
+    parser.add_argument("--to",
+                        type=str,
+                        required=False,
+                        default=None,
+                        help="ESGF search 'to' keyword.")
+    parser.add_argument("--from",
+                        type=str,
+                        required=False,
+                        default=None,
+                        help="ESGF search 'from' keyword.")
     parser.set_defaults()
     args = vars(parser.parse_args())
 
@@ -332,7 +350,7 @@ if __name__ == "__main__":
     if args["selection"]:
         query = SelectionQuery(args["selection"])
     else:
-        query = ExtensiveQuery(project)
+        query = ExtensiveQuery(project, args["from"], args["to"])
 
     # create sqlite db and get connection
     logging.info("Set up sqlite database.")
