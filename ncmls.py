@@ -1,19 +1,10 @@
-# coding: utf-8
-
-import os
-import sys
-import re
 import argparse
-
-import logging
-
-import zipfile
+import os
+import re
 import sqlite3
-import numpy as np
 import pandas as pd
-from jinja2 import Environment, FileSystemLoader, ChoiceLoader, select_autoescape
-
 from multiprocessing import Pool
+from jinja2 import Environment, FileSystemLoader, ChoiceLoader, select_autoescape
 
 PROJECTS = {
     "esgf_dataset": {
@@ -24,14 +15,6 @@ PROJECTS = {
         "query_datasets": "select distinct(eva_esgf_dataset) from cmip6",
     },
 
-    "esgf_dataset_test": {
-        "template": "templates/esgf_dataset.ncml.j2",
-        "dest_replica": "esgeva/CMIP6/variable/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{grid_label}_{version}/replicas/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
-        "dest_master": "esgeva/CMIP6/variable/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
-        "query_dataset": "select * from cmip6 where eva_esgf_dataset = :dataset and opendap != \"\"",
-        "query_datasets": "select distinct(eva_esgf_dataset) from cmip6 limit 3000",
-    },
-
     "esgf_ensemble": {
         "template": "templates/esgf_ensemble.ncml.j2",
         "dest_replica": "esgeva/CMIP6/ensemble/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/replicas/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}_{data_node}.ncml",
@@ -40,13 +23,6 @@ PROJECTS = {
         "query_datasets": "select distinct(eva_ensemble_aggregation) from cmip6",
     },
 
-    "esgf_ensemble_test": {
-        "template": "templates/cmip6_ensemble.ncml.j2",
-        "dest_replica": "esgeva/CMIP6/ensemble/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/replicas/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}_{data_node}.ncml",
-        "dest_master": "esgeva/CMIP6/ensemble/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}_{data_node}.ncml",
-        "query_dataset": "select * from cmip6 where eva_ensemble_aggregation = :dataset and opendap != \"\"",
-        "query_datasets": "select distinct(eva_ensemble_aggregation) from cmip6 limit 3000",
-    },
 }
 
 
@@ -135,6 +111,11 @@ if __name__ == "__main__":
                         required=False,
                         default="",
                         help="destination directory.")
+    parser.add_argument("-j", "--jobs",
+                        type=int,
+                        required=False,
+                        default=8,
+                        help="number of jobs.")
     parser.set_defaults()
     args = vars(parser.parse_args())
 
@@ -151,9 +132,8 @@ if __name__ == "__main__":
     cursor.close()
     conn.close()
 
-    njobs = int(os.getenv("SLURM_TASKS_PER_NODE", default=8))
     with Pool(
-            njobs,
+            args["jobs"],
             initializer=init_worker,
             initargs=(
                     args["database"],

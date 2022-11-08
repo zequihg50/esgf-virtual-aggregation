@@ -20,37 +20,8 @@ LIMIT = 9000
 TIMEOUT = 120  # seconds
 TOLERANCE = 12  # if each node (6 index nodes) fails two times, abort
 
-# mostly for debug
-HIGH_PRIORITY = ["cl", "cl10", "cl100", "cl1000", "cl150", "cl20", "cl200", "cl250",
-                 "cl30", "cl300", "cl400", "cl50", "cl500", "cl600", "cl70", "cl700", "cl850", "cl925",
-                 "clivi", "clt", "clwvi", "hfcorr", "hfls", "hfss", "hur", "hur10", "hur100", "hur1000",
-                 "hur150", "hur20", "hur200", "hur250", "hur30", "hur300", "hur400", "hur50", "hur500",
-                 "hur600", "hur70", "hur700", "hur850", "hur925", "hus", "hus10", "hus100", "hus1000",
-                 "hus150", "hus20", "hus200", "hus250", "hus30", "hus300", "hus400", "hus50", "hus500",
-                 "hus600", "hus70", "hus700", "hus850", "hus925", "huss", "mrfso", "mrro", "mrros", "mrso",
-                 "mrsofc", "mrsos", "orog", "pr", "prc", "prsn", "prw", "ps", "psl", "rhopoto", "rlds",
-                 "rldscs", "rlntp", "rlntpcs", "rlus", "rlut", "rlutcs", "rsds", "rsdscs", "rsdt", "rsntp",
-                 "rsntpcs", "rsus", "rsuscs", "rsut", "rsutcs", "rtmt", "sftgif", "sftlf", "sic", "sit",
-                 "snc", "snd", "snm", "snw", "so", "stfbarot", "ta", "ta10", "ta100", "ta1000",
-                 "ta150", "ta20", "ta200", "ta250", "ta30", "ta300", "ta400", "ta50",
-                 "ta500", "ta600", "ta70", "ta700", "ta850", "ta925", "tas", "tasmax",
-                 "tasmin", "tauu", "tauucorr", "tauv", "tauvcorr", "thetao", "tos", "tro3",
-                 "ts", "ua", "ua10", "ua100", "ua1000", "ua150", "ua20", "ua200", "ua250",
-                 "ua30", "ua300", "ua400", "ua50", "ua500", "ua600", "ua70", "ua700", "ua850",
-                 "ua925", "uas", "uo", "usi", "va", "va10", "va100", "va1000", "va150", "va20",
-                 "va200", "va250", "va30", "va300", "va400", "va50", "va500", "va600", "va70",
-                 "va700", "va850", "va925", "vas", "vo", "vsi", "wap", "wap10", "wap100", "wap1000",
-                 "wap150", "wap20", "wap200", "wap250", "wap30", "wap300", "wap400", "wap50", "wap500",
-                 "wap600", "wap70", "wap700", "wap850", "wap925", "wfcorr", "wfo", "wo", "zg", "zg10",
-                 "zg100", "zg1000", "zg150", "zg20", "zg200", "zg250", "zg30", "zg300", "zg400", "zg50",
-                 "zg500", "zg600", "zg70", "zg700", "zg850", "zg925", "zos", "zosga", "zostoga"]
-HIGH_PRIORITY = ["tas", "pr", "tasmin", "tasmax"]
-
 
 class Project():
-    def __init__(self):
-        self.high_priority = HIGH_PRIORITY
-
     def find_opendap_url(self, urls):
         opendap_url = ""
         for url in urls:
@@ -407,8 +378,10 @@ if __name__ == "__main__":
                     logging.info("Changing INDEX to: {}.".format(INDEX))
         s.close()
     finally:
-        c.execute("CREATE INDEX cmip6_data_node ON cmip6(data_node)")
-        c.execute("CREATE INDEX cmip6_eva_esgf_dataset ON cmip6(eva_esgf_dataset)")
+        c.execute(
+            "CREATE INDEX cmip6_data_node ON cmip6(data_node)")
+        c.execute(
+            "CREATE INDEX cmip6_eva_esgf_dataset ON cmip6(eva_esgf_dataset)")
         c.execute(
             "CREATE INDEX cmip6_eva_ensemble_aggregation ON cmip6(eva_ensemble_aggregation)")
 
