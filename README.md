@@ -1,4 +1,4 @@
-# ESGF Virtual Aggregation Project
+# ESGF Virtual Aggregation dataset
 
 The aim of this project is to create a ready-to-deploy TDS catalog including **ALL** available data in ESGF, using OpenDAP endpoints to provide ESGF data analysis while avoiding the download of any data from remote repositories.
 
@@ -12,12 +12,21 @@ The idea is as follows:
 
 2 - Store file metadata locally using `PyTables` to efficiently perform queries.
 
-3 - Create THREDDS NcMLs and catalogs via `SantanderMetGroup/publisher` and OpenDAP endpoints.
+3 - Create THREDDS NcMLs and catalogs and OpenDAP endpoints.
 
 4 - Provide multiple virtual views of the datasets:
   - ESGF dataset - Aggregate files in the same way that `esgf-search type=Dataset`.
   - Variable aggregation - Aggregate all variables into a single dataset.
   - Ensemble aggregation - Aggregate all variables and ensembles into a single dataset.
+
+## Notes
+
+Check facets from ESGF: `https://esgf-node.llnl.gov/esg-search/search/?limit=0&type=File&project=CMIP6&format=application%2Fsolr%2Bjson&facets=*`
+Check facets from EVA: `select activity_id, count(activity_id) from cmip6 group by activity_id`
+
+### Interesting ncmls
+
+`esgeva/CMIP6/ensemble/CMIP/6hrLev/CMIP6_CMIP_BCC_BCC-CSM2-MR_amip_6hrLev_gn_v20190128/CMIP6_CMIP_BCC_BCC-CSM2-MR_amip_6hrLev_gn_v20190128_cmip.bcc.cma.cn.ncml` - Big file
 
 ## ESGF projects
 
@@ -36,18 +45,6 @@ Columns for CORDEX:
 ```
 
 ## Usage
-
-`./search.sh` - Comment lines for projects you want to ignore. Take into account that for CMIP6 this takes a couple of days.
-`python dump.py [--overwrite]` - Generate CSV files for datasets.
-`./ncmls.sh` - Generate NcMLs from input files generated from `dump.py`.
-
-I use a job script like the following:
-
-```bash
-#!/bin/bash
-
-python dump.py --dest $DATASETS $HDF | ./publisher.sh
-```
 
 ## Regular update
 

@@ -9,6 +9,9 @@ df = pd.read_pickle(source)
 subset = df[('GLOBALS', 'data_node')] == 'aims3.llnl.gov'
 df.loc[subset, ('GLOBALS', 'OPENDAP')] = df.loc[subset, ('GLOBALS', 'OPENDAP')].str.replace('^http://', 'https://', regex=True)
 
+# some versions contain "v" at the beggining, others do not
+df[('GLOBALS', 'version')] = df[('GLOBALS', 'version')].str.lstrip('v')
+
 # fix time values per variable
 df[('GLOBALS', '_modified_time_coord')] = False
 df[('GLOBALS', '_CoordinateAxes')] = None
@@ -29,7 +32,7 @@ for varname, vargroup in df[df[('GLOBALS', 'frequency')] != "fx"].groupby( ('GLO
             df.loc[vargroup.index, (varname, 'cell_methods')].str.replace(r'\btime\b', '_'.join(['time', varname]), regex=True)
 
     # explicitly declare _CoordinateAxes for netcdf-java
-    coords = [(varname, 'coordinates'), (varname, '_dimensions')]
+    coords = [(varname, x) for x in ['coordinates', '_dimensions'] if (varname, x) in df.columns]
     df.loc[vargroup.index, ('GLOBALS', '_CoordinateAxes')] = df.loc[vargroup.index, coords].fillna('').agg(
         lambda x: ','.join([y for y in x if y != '']), axis=1)
 
