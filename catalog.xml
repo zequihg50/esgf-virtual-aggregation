@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         name="Unidata THREDDS Data Server">
+
+    <service name="all" base="" serviceType="Compound" >
+        <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+        <service name="http" serviceType="FileServer" base="/thredds/fileServer/" />
+    </service>
+    <datasetScan name="ESGF Virtual Aggregation" ID="esgf_virtual_aggregation" path="esgeva" location="content/esgeva">
+        <metadata inherited="true">
+          <serviceName>all</serviceName>
+        </metadata>
+    </datasetScan>
+</catalog>
