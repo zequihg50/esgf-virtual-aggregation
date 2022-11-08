@@ -10,7 +10,7 @@ INDEX_NODES = [
     "esgf-node.llnl.gov",
     "esgf.nci.org.au",
     "esgf-data.dkrz.de",
-    "esgf-index1.ceda.ac.uk",
+    "esgf.ceda.ac.uk",
     "esgf-node.ipsl.upmc.fr",
 ]
 
