@@ -30,10 +30,10 @@ class Project():
 
         return opendap_url
 
-    def parse_record(self, record):
+    def query(self):
         raise NotImplementedError
 
-    def get_datanode_variable_pairs(self):
+    def parse_record(self, record):
         raise NotImplementedError
 
     def get_version(self):
@@ -49,24 +49,39 @@ class Cmip6(Project):
                         "variable_id", "grid_label", "frequency", "realm", "product", "variant_label",
                         "further_info_url", "activity_id", "pid")
 
-    def get_datanode_variable_pairs(self):
+    def query(self):
+        datanodes = self.get_datanodes()
+        for datanode in datanodes:
+            datanode_vars = self.get_variables_for_datanode(datanode)
+            for v in datanode_vars:
+                yield {"data_node": datanode, "variable_id": v}
+
+    def get_datanodes(self):
         session = requests.Session()
         r = session.get(SEARCH, timeout=TIMEOUT, params={
-            "facets": "variable_id,data_node",
+            "facets": "data_node",
             "project": "CMIP6",
             "limit": 0,
             "format": "application/solr+json"})
         response = r.json()
         session.close()
 
-        variables = response["facet_counts"]["facet_fields"]["variable_id"][::2]
         datanodes = response["facet_counts"]["facet_fields"]["data_node"][::2]
+        return datanodes
 
-        facets = [{"data_node": datanode, "variable_id": variable}
-                  for datanode in datanodes
-                  for variable in variables]
+    def get_variables_for_datanode(self, datanode):
+        session = requests.Session()
+        r = session.get(SEARCH, timeout=TIMEOUT, params={
+            "facets": "variable_id",
+            "project": "CMIP6",
+            "data_node": datanode,
+            "limit": 0,
+            "format": "application/solr+json"})
+        response = r.json()
+        session.close()
 
-        return facets
+        variables = response["facet_counts"]["facet_fields"]["variable_id"][::2]
+        return variables
 
     def get_version(self, dataset_id):
         version = re.sub("\|.*", "", dataset_id)
@@ -267,7 +282,7 @@ class ExtensiveQuery(Query):
         self.to = to
 
     def query(self):
-        for q in project.get_datanode_variable_pairs():
+        for q in project.query():
             qcopy = q.copy()
             if self.frm:
                 qcopy["from"] = self.frm
