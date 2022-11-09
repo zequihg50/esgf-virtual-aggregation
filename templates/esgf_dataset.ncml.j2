@@ -51,13 +51,14 @@
     <attribute name="replica" value="{{ df['replica'].iloc[0]|lower }}"/>
 
     <dimension name="nfiles" length="{{ df|length }}"/>
+    <dimension name="file" length="2"/>
     {% if 'further_info_url' in df.columns %}
-    <variable name="further_info_url" type="string" shape="nfiles 2">
+    <variable name="further_info_url" type="string" shape="nfiles file">
         <values>{{ (df[['opendap', 'further_info_url']].agg(' '.join, axis=1))|join(' ') }}</values>
     </variable>
     {% endif %}
     {% if 'tracking_id' in df.columns %}
-    <variable name="tracking_id" type="string" shape="nfiles 2">
+    <variable name="tracking_id" type="string" shape="nfiles file">
         <values>{{ (df[['opendap', 'tracking_id']].fillna('').agg(' '.join, axis=1))|join(' ') }}</values>
     </variable>
     {% endif %}

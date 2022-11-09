@@ -17,8 +17,8 @@ PROJECTS = {
 
     "esgf_ensemble": {
         "template": "templates/esgf_ensemble.ncml.j2",
-        "dest_replica": "content/public/esgeva/ensemble/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/replicas/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}_{data_node}.ncml",
-        "dest_master": "content/public/esgeva/ensemble/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}_{data_node}.ncml",
+        "dest_replica": "content/public/esgeva/ensemble/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/replicas/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
+        "dest_master": "content/public/esgeva/ensemble/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
         "query_dataset": "select * from cmip6 where eva_ensemble_aggregation = :dataset and opendap != \"\"",
         "query_datasets": "select distinct(eva_ensemble_aggregation) from cmip6",
     },
@@ -106,11 +106,11 @@ if __name__ == "__main__":
                         required=True,
                         type=str,
                         help="database file.")
-#    parser.add_argument("-d", "--dest",
-#                        type=str,
-#                        required=False,
-#                        default="",
-#                        help="destination directory.")
+    #    parser.add_argument("-d", "--dest",
+    #                        type=str,
+    #                        required=False,
+    #                        default="",
+    #                        help="destination directory.")
     parser.add_argument("-j", "--jobs",
                         type=int,
                         required=False,

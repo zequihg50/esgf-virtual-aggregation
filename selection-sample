@@ -1,0 +1,5 @@
+project=CMIP6 type=File variable_id=tas frequency=day data_node=esgf.ceda.ac.uk
+
+project=CMIP6 type=File variable_id=pr frequency=day data_node=esgf3.dkrz.de
+
+project=CMIP6 type=File variable_id=orog data_node=esgf.nci.org.au

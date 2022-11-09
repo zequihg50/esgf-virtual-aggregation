@@ -8,9 +8,9 @@ import requests
 INDEX_NODES = [
     "esg-dn1.nsc.liu.se",
     "esgf-node.llnl.gov",
-    "esgf.nci.org.au",
     "esgf-data.dkrz.de",
     "esgf.ceda.ac.uk",
+    "esgf.nci.org.au",
     "esgf-node.ipsl.upmc.fr",
 ]
 
