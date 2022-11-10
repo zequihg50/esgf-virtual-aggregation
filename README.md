@@ -9,8 +9,8 @@ OpenDAP endpoints to provide ESGF data analysis while avoiding the download of a
 
 The ESGF Virtual Aggregation data workflowo involves two steps:
 
-1 - Query ESGF fedeartion for metadata and store it in a local SQL database.
-2 - Generate virtual aggregations (NcMLs) from the SQL database.
+1. Query ESGF fedeartion for metadata and store it in a local SQL database.
+2. Generate virtual aggregations (NcMLs) from the SQL database.
 
 ESGF Virtual Aggregation is fully customizable via `selection` files. See the sample file `selection-sample`.
 
