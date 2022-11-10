@@ -1,5 +1,6 @@
 channels:
   - conda-forge
+  - santandermetgroup
   - nodefaults
 dependencies:
   - sqlite
