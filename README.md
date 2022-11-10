@@ -1,27 +1,44 @@
 # ESGF Virtual Aggregation
 
-The aim of this project is to create a ready-to-deploy TDS catalog including **ALL** available data in ESGF, using OpenDAP endpoints to provide ESGF data analysis while avoiding the download of any data from remote repositories.
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb)
 
-**Why?** Because we think that currently ESGF does not make use of state of the art capabilities in their current software stack that would easily provide additional useful services for end users.
-
-The EVA works as follows:
-
-1 - Use ESGF search service to query available information.
-
-2 - Store file metadata locally using SQL to efficiently perform queries.
-
-3 - Create THREDDS NcMLs and catalogs using OpenDAP endpoints.
-
-4 - Provide multiple virtual views of the datasets:
-  - ESGF dataset - Aggregate time series for variables.
-  - ESGF ensemble - Aggregate time series and ensembles into a single dataset.
+The aim of this project is to create a ready-to-deploy TDS catalog including **ALL** available data in ESGF, using
+OpenDAP endpoints to provide ESGF data analysis while avoiding the download of any data from remote repositories.
 
 ## Usage
 
-## Notes
+The ESGF Virtual Aggregation data workflowo involves two steps:
 
-Check facets from ESGF: `https://esgf-node.llnl.gov/esg-search/search/?limit=0&type=File&project=CMIP6&format=application%2Fsolr%2Bjson&facets=*`
+1 - Query ESGF fedeartion for metadata and store it in a local SQL database.
+2 - Generate virtual aggregations (NcMLs) from the SQL database.
 
-Check facets from EVA: `select activity_id, count(activity_id) from cmip6 group by activity_id`
+ESGF Virtual Aggregation is fully customizable via `selection` files. See the sample file `selection-sample`.
 
-## Contact
+The following code generates the metadata SQL database from the `selection-sample` file.
+
+```bash
+python search.py -d sample.db -s selection-sample
+```
+
+Now, generate the virtual aggregations (both `esgf_dataset` and `esgf_ensemble`) from the database using 4 parallel jobs.
+
+```bash
+python ncmls.py -j4 --database sample.db -p esgf_dataset
+python ncmls.py -j4 --database sample.db -p esgf_ensemble
+```
+
+You will find that the virtual aggregations are NcML files. You will need a client based on netCDF-java to read them
+or you can also set up a TDS server and read via OpenDAP. See next section.
+
+## ESGF Virtual Aggregation demo
+
+Now we will deploy a THREDDS Data Server (TDS) and perform remote data analysis on the ESGF Virtual Aggregation
+dataset.
+
+```bash
+docker run -p 8080:8080 -v $(pwd)/content:/usr/local/tomcat/content/thredds unidata/thredds-docker:5.0-beta7
+```
+
+Now, visit `localhost:8080/thredds` and inspect the server's directory. You may download the NcML from the HTTPServer
+endpoint or use the OpenDAP service to get the OpenDAP URL (it should look like `http://localhost:8080/thredds/dodsC/...`).
+

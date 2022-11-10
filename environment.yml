@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - sqlite3
+  - requests
+  - pandas
+  - jinja2
