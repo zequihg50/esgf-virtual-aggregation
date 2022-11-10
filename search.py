@@ -17,8 +17,8 @@ INDEX_NODES = [
 INDEX = INDEX_NODES[0]
 SEARCH = "https://{}/esg-search/search".format(INDEX)
 LIMIT = 9000
-TIMEOUT = 120  # seconds
-TOLERANCE = 12  # if each node (6 index nodes) fails two times, abort
+TIMEOUT = 240  # seconds
+TOLERANCE = 120  # if each node (6 index nodes) fails 20 times, abort
 
 
 class Project():
@@ -48,13 +48,17 @@ class Cmip6(Project):
         self.project = ("mip_era", "project", "institution_id", "source_id", "experiment_id", "table_id",
                         "variable_id", "grid_label", "frequency", "realm", "product", "variant_label",
                         "further_info_url", "activity_id", "pid")
+        self.variables = (
+        "ua", "va", "ta", "hus", "pr", "zg", "thetao", "ua", "wap", "tas", "va", "hur", "vo", "uo", "so", "ta", "hus",
+        "tos", "thetao", "tasmax")
 
     def query(self):
         datanodes = self.get_datanodes()
         for datanode in datanodes:
             datanode_vars = self.get_variables_for_datanode(datanode)
             for v in datanode_vars:
-                yield {"data_node": datanode, "variable_id": v}
+                if v in self.variables:
+                    yield {"data_node": datanode, "variable_id": v}
 
     def get_datanodes(self):
         session = requests.Session()

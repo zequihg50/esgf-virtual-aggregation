@@ -6,3 +6,4 @@ dependencies:
   - requests
   - pandas
   - jinja2
+  - r-climate4r

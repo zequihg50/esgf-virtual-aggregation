@@ -42,3 +42,24 @@ docker run -p 8080:8080 -v $(pwd)/content:/usr/local/tomcat/content/thredds unid
 Now, visit `localhost:8080/thredds` and inspect the server's directory. You may download the NcML from the HTTPServer
 endpoint or use the OpenDAP service to get the OpenDAP URL (it should look like `http://localhost:8080/thredds/dodsC/...`).
 
+The OpenDAP service may be used to perform remote data analysis using xarray.
+
+```python
+import xarray,dask
+
+dask.config.set(scheduler="processes")
+
+url = "http://localhost:8080/thredds/dodsC/esgeva/demo/CMIP6_CMIP_AS-RCEC_TaiESM1_historical_day_tas_gn_v20200626_esgf.ceda.ac.uk.ncml"
+ds = xarray.open_dataset(url).chunk({"time": 100})
+
+# query the size of the dataset on the server side
+ds.attrs["size_human"]
+
+# view the variant_label coordinate
+ds["variant_label"][...].compute()
+
+# compute spatial mean for all variant_labels
+# this involves transferring the necessary data from the server
+means = ds["tas"].mean(["lat", "lon"]).compute()
+means
+```
