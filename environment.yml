@@ -6,4 +6,8 @@ dependencies:
   - requests
   - pandas
   - jinja2
+  - xarray
+  - dask
+  - matplotlib
+  - cartopy
   - r-climate4r

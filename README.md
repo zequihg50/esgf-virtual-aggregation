@@ -63,3 +63,6 @@ ds["variant_label"][...].compute()
 means = ds["tas"].mean(["lat", "lon"]).compute()
 means
 ```
+
+The Jupyter notebook `demo.ipynb` contains an example of a data analyis using the ESGF Virtual Aggregation. Also, a
+climate4R example is provided in `demo-r.ipynb`.
