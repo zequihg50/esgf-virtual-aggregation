@@ -2,7 +2,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - sqlite3
+  - sqlite
   - requests
   - pandas
   - jinja2
