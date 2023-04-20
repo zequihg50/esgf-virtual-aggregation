@@ -8,6 +8,7 @@ dependencies:
   - pandas
   - jinja2
   - xarray
+  - netcdf4
   - dask
   - matplotlib
   - cartopy
