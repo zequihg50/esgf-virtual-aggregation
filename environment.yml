@@ -11,4 +11,5 @@ dependencies:
   - dask
   - matplotlib
   - cartopy
-  - r-climate4r
+  - zarr
+  - s3fs
