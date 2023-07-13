@@ -14,3 +14,4 @@ dependencies:
   - cartopy
   - zarr
   - s3fs
+  - seaborn
