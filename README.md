@@ -32,7 +32,9 @@ or you can also set up a TDS server and read via OpenDAP. See next section.
 
 ## ESGF Virtual Aggregation demo
 
-Now we will deploy a THREDDS Data Server (TDS) and perform remote data analysis on the ESGF Virtual Aggregation
+A THREDDS Data Server (TDS) with access to the ESGF Virtual Aggregation datasets is available at `https://hub.ipcc.ifca.es/thredds`.
+
+You may deploy your own THREDDS Data Server and perform remote data analysis on the ESGF Virtual Aggregation
 dataset.
 
 ```bash
@@ -64,5 +66,4 @@ means = ds["tas"].mean(["lat", "lon"]).compute()
 means
 ```
 
-The Jupyter notebook `demo.ipynb` contains an example of a data analyis using the ESGF Virtual Aggregation. Also, a
-climate4R example is provided in `demo-r.ipynb`.
+See the notebooks for usage and reproducibility.
