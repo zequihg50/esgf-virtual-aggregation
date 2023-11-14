@@ -2,12 +2,70 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb)
 
-The aim of this project is to create a ready-to-deploy TDS catalog including **ALL** available data in ESGF, using
-OpenDAP endpoints to provide ESGF data analysis while avoiding the download of any data from remote repositories.
+Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
+
+## Demo
+
+Query the ESGF Virtual Aggregation catalog and get the URL of a dataset:
+
+```python
+import pandas as pd
+
+# Load the inventory
+df = pd.read_csv("https://hub.ipcc.ifca.es/thredds/fileServer/inventory.csv")
+
+# Find a dataset
+subset = df.query("aggregation == 'ensemble' & product == 'ScenarioMIP' & model == 'CNRM-CM6-1' & experiment == 'ssp245' & table == 'day' & variable == 'tas' & version == 'v20190410'")
+
+# See available data nodes
+subset[["location", "data_node"]]
+
+# Select a data node and get the url
+url = subset.query("data_node == 'aims3.llnl.gov'")["location"].iloc[0]
+```
+
+Open the URL with an OPeNDAP compatible client (see [xarray](https://docs.xarray.dev/en/stable/) and [climate4R](https://github.com/SantanderMetGroup/climate4R)).
+
+```python
+import xarray
+
+ds = xarray.open_dataset(url)
+print(ds)
+
+# query the size of the dataset on the server side
+ds.attrs["size_human"]
+
+# view the variant_label coordinate
+ds["variant_label"][...]
+```
+
+or
+
+```R
+library(loadeR)
+
+di<-dataInventory(url)
+```
+
+Scale with [dask](https://www.dask.org/) (xarray only):
+
+```python
+ds_chunked = ds.chunk({"time": 100})
+print(ds_chunked)
+```
+
+## Rationale
+
+The ESGF is a federated file distribution service for climate data. Remote data access and virtual datasets are possible through OPeNDAP and netCDF-java, available by default in all ESGF nodes. However, these capabilities have never been used. This provides:
+
+- Analysis Ready Data (ARD) in the form of virtual datasets, that is, no data duplication needed.
+- Remote data access without the need to download files. Open an URL and get direct access to an analytical data cube.
+
+This work is a bridge between the current state of the federation and more elaborated [ETL](https://es.wikipedia.org/wiki/Extract,_transform_and_load) attemps such as [Google CMIP6](https://gallery.pangeo.io/repos/pangeo-gallery/cmip6/basic_search_and_load.html) from [Pangeo](https://pangeo.io/). The later is a much more expensive workflow that requires duplication of the datasets into a cloud provider, which in advantage offers much more scalable data service compared to the "best effort" basis of the ESGF data nodes.
 
 ## Usage
 
-The ESGF Virtual Aggregation data workflowo involves two steps:
+The ESGF Virtual Aggregation data involves two steps:
 
 1. Query ESGF fedeartion for metadata and store it in a local SQL database.
 2. Generate virtual aggregations (NcMLs) from the SQL database.
@@ -30,7 +88,7 @@ python ncmls.py -j4 --database sample.db -p esgf_ensemble
 You will find that the virtual aggregations are NcML files. You will need a client based on netCDF-java to read them
 or you can also set up a TDS server and read via OpenDAP. See next section.
 
-## ESGF Virtual Aggregation demo
+### Run your own ESGF Virtual Aggregation
 
 A THREDDS Data Server (TDS) with access to the ESGF Virtual Aggregation datasets is available at `https://hub.ipcc.ifca.es/thredds`.
 
