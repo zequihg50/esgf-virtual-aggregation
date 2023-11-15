@@ -47,7 +47,7 @@ class Cmip6(Project):
                      "master_id", "replica", "size", "timestamp", "title", "tracking_id", "_timestamp")
         self.project = ("mip_era", "project", "institution_id", "source_id", "experiment_id", "table_id",
                         "variable_id", "grid_label", "frequency", "realm", "product", "variant_label",
-                        "further_info_url", "activity_id", "pid")
+                        "further_info_url", "activity_id", "pid", "member_id")
         self.variables = (
         "ua", "va", "ta", "hus", "pr", "zg", "thetao", "ua", "wap", "tas", "va", "hur", "vo", "uo", "so", "ta", "hus",
         "tos", "thetao", "tasmax")
@@ -214,8 +214,8 @@ def createdb(cursor):
     realm TEXT,
     product TEXT,
     variant_label TEXT,
+    member_id TEXT,
     activity_id TEXT,
-    
     
     further_info_url TEXT,
     pid TEXT,
@@ -263,6 +263,7 @@ def search(session, project, query):
             fixed["realm"],
             fixed["product"],
             fixed["variant_label"],
+            fixed["member_id"],
             fixed["activity_id"],
             fixed["further_info_url"],
             fixed["pid"],

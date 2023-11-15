@@ -15,3 +15,4 @@ dependencies:
   - zarr
   - s3fs
   - seaborn
+  - nc-time-axis

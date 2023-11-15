@@ -9,8 +9,8 @@ from jinja2 import Environment, FileSystemLoader, ChoiceLoader, select_autoescap
 PROJECTS = {
     "esgf_dataset": {
         "template": "templates/esgf_dataset.ncml.j2",
-        "dest_replica": "content/public/esgeva/variable/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{grid_label}_{version}/replicas/{data_node}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
-        "dest_master": "content/public/esgeva/variable/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{variant_label}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
+        "dest_replica": "content/public/esgeva/variable/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{member_id}_{table_id}_{grid_label}_{version}/replicas/{data_node}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{member_id}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
+        "dest_master": "content/public/esgeva/variable/CMIP6/{activity_id}/{table_id}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{member_id}_{table_id}_{grid_label}_{version}/{mip_era}_{activity_id}_{institution_id}_{source_id}_{experiment_id}_{member_id}_{table_id}_{variable_id}_{grid_label}_{version}_{data_node}.ncml",
         "query_dataset": "select * from cmip6 where eva_esgf_dataset = :dataset and opendap != \"\"",
         "query_datasets": "select distinct(eva_esgf_dataset) from cmip6",
     },
