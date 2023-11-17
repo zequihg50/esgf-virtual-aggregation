@@ -47,7 +47,7 @@ class Cmip6(Project):
                      "master_id", "replica", "size", "timestamp", "title", "tracking_id", "_timestamp")
         self.project = ("mip_era", "project", "institution_id", "source_id", "experiment_id", "table_id",
                         "variable_id", "grid_label", "frequency", "realm", "product", "variant_label",
-                        "further_info_url", "activity_id", "pid", "member_id")
+                        "further_info_url", "activity_id", "pid", "member_id", "sub_experiment_id")
         self.variables = (
         "ua", "va", "ta", "hus", "pr", "zg", "thetao", "ua", "wap", "tas", "va", "hur", "vo", "uo", "so", "ta", "hus",
         "tos", "thetao", "tasmax")
@@ -57,8 +57,9 @@ class Cmip6(Project):
         for datanode in datanodes:
             datanode_vars = self.get_variables_for_datanode(datanode)
             for v in datanode_vars:
-                if v in self.variables:
-                    yield {"data_node": datanode, "variable_id": v}
+                #if v in self.variables:
+                #    yield {"data_node": datanode, "variable_id": v}
+                yield {"data_node": datanode, "variable_id": v}
 
     def get_datanodes(self):
         session = requests.Session()
@@ -215,6 +216,7 @@ def createdb(cursor):
     product TEXT,
     variant_label TEXT,
     member_id TEXT,
+    sub_experiment_id TEXT,
     activity_id TEXT,
     
     further_info_url TEXT,
@@ -264,6 +266,7 @@ def search(session, project, query):
             fixed["product"],
             fixed["variant_label"],
             fixed["member_id"],
+            fixed["sub_experiment_id"],
             fixed["activity_id"],
             fixed["further_info_url"],
             fixed["pid"],
