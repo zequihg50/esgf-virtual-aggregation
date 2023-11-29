@@ -50,8 +50,14 @@ di<-dataInventory(url)
 Scale with [dask](https://www.dask.org/) (xarray only):
 
 ```python
-ds_chunked = ds.chunk({"time": 100})
+ds_chunked = ds.chunk({"variant_label": 1, "time": 100})
 print(ds_chunked)
+```
+
+Trivial conversion to a Zarr store:
+
+```
+ds_chunked.to_zarr("CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_tas_gr_v20190410_aims3.llnl.gov.zarr")
 ```
 
 ## Rationale
