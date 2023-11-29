@@ -69,7 +69,9 @@ The ESGF is a federated file distribution service for climate data. Remote data 
 
 ### Note for the Pangeo community
 
-This work is a bridge between the current state of the federation and more elaborated [ETL](https://es.wikipedia.org/wiki/Extract,_transform_and_load) attemps such as [Google CMIP6](https://gallery.pangeo.io/repos/pangeo-gallery/cmip6/basic_search_and_load.html) from [Pangeo](https://pangeo.io/). The later is a much more expensive workflow that requires duplication of the datasets into a cloud provider, which in advantage offers much more scalable data service compared to the "best effort" basis of the ESGF data nodes.
+This work is a bridge between the current state of the federation and more elaborated [ETL](https://es.wikipedia.org/wiki/Extract,_transform_and_load) attemps such as [Google CMIP6](https://gallery.pangeo.io/repos/pangeo-gallery/cmip6/basic_search_and_load.html) from [Pangeo](https://pangeo.io/). The later is a much more expensive workflow that requires duplication of the datasets into a cloud provider, which in advantage offers much more scalable data service compared to the "best effort" basis of the ESGF data nodes. Also, the ESGF Virtual Aggregation offers a higher level Analysis Ready Dataset by adding the `ensemble` dimension to the variables.
+
+![tas4d](tas4d.png)
 
 The ESGF Virtual Aggregation could act as an intermediate between the ESGF and cloud native repositories. Because ESGF Virtual Aggregation is much cheaper to run (since it only reads metadata from the ESGF distributed index), cloud repositories using cloud optimized formats (Zarr) can be created much easier. For example:
 
