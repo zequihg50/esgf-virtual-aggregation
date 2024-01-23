@@ -139,17 +139,31 @@ class Cmip6(Project):
             self.get_version(record["dataset_id"]),
             record["data_node"]])
 
-        row["eva_ensemble_aggregation"] = "_".join([
-            record["project"][0],
-            record["activity_id"][0],
-            record["institution_id"][0],
-            record["source_id"][0],
-            record["experiment_id"][0],
-            record["table_id"][0],
-            record["variable_id"][0],
-            record["grid_label"][0],
-            self.get_version(record["dataset_id"]),
-            record["data_node"]])
+        if record["sub_experiment_id"][0] == "none":
+            row["eva_ensemble_aggregation"] = "_".join([
+                record["project"][0],
+                record["activity_id"][0],
+                record["institution_id"][0],
+                record["source_id"][0],
+                record["experiment_id"][0],
+                record["table_id"][0],
+                record["variable_id"][0],
+                record["grid_label"][0],
+                self.get_version(record["dataset_id"]),
+                record["data_node"]])
+        else:
+            row["eva_ensemble_aggregation"] = "_".join([
+                record["project"][0],
+                record["activity_id"][0],
+                record["institution_id"][0],
+                record["source_id"][0],
+                record["experiment_id"][0],
+                record["sub_experiment_id"][0],
+                record["table_id"][0],
+                record["variable_id"][0],
+                record["grid_label"][0],
+                self.get_version(record["dataset_id"]),
+                record["data_node"]])
 
         return row
 
