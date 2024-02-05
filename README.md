@@ -15,7 +15,7 @@ import pandas as pd
 df = pd.read_csv("https://hub.ipcc.ifca.es/thredds/fileServer/inventory.csv")
 
 # Find a dataset
-subset = df.query("aggregation == 'ensemble' & product == 'ScenarioMIP' & model == 'CNRM-CM6-1' & experiment == 'ssp245' & table == 'day' & variable == 'tas' & version == 'v20190410'")
+subset = df.query("product == 'ScenarioMIP' & model == 'CNRM-CM6-1' & experiment == 'ssp245' & table == 'day' & variable == 'tas' & version == 'v20190410'")
 
 # See available data nodes
 subset[["location", "data_node"]]
