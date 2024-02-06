@@ -4,89 +4,12 @@
 
 Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
 
-## Demo
-
-Query the ESGF Virtual Aggregation catalog and get the URL of a dataset:
-
-```python
-import pandas as pd
-
-# Load the inventory
-df = pd.read_csv("https://hub.ipcc.ifca.es/thredds/fileServer/inventory.csv")
-
-# Find a dataset
-subset = df.query("product == 'ScenarioMIP' & model == 'CNRM-CM6-1' & experiment == 'ssp245' & table == 'day' & variable == 'tas' & version == 'v20190410'")
-
-# See available data nodes
-subset[["location", "data_node"]]
-
-# Select a data node and get the url
-url = subset.query("data_node == 'aims3.llnl.gov'")["location"].iloc[0]
-```
-
-Open the URL with an OPeNDAP compatible client (see [xarray](https://docs.xarray.dev/en/stable/) and [climate4R](https://github.com/SantanderMetGroup/climate4R)).
-
-```python
-import xarray
-
-ds = xarray.open_dataset(url)
-print(ds)
-
-# query the size of the dataset on the server side
-ds.attrs["size_human"]
-
-# view the variant_label coordinate
-ds["variant_label"][...]
-```
-
-or
-
-```R
-library(loadeR)
-
-di<-dataInventory(url)
-```
-
-Scale with [dask](https://www.dask.org/) (xarray only):
-
-```python
-ds_chunked = ds.chunk({"variant_label": 1, "time": 100})
-print(ds_chunked)
-```
-
-Trivial conversion to a Zarr store:
-
-```
-ds_chunked.to_zarr("CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_tas_gr_v20190410_aims3.llnl.gov.zarr")
-```
-
 ## Rationale
 
 The ESGF is a federated file distribution service for climate data. Remote data access and virtual datasets are possible through OPeNDAP and netCDF-java, available by default in all ESGF nodes. However, these capabilities have never been used. This provides:
 
 - Analysis Ready Data (ARD) in the form of virtual datasets, that is, no data duplication needed.
 - Remote data access without the need to download files. Open an URL and get direct access to an analytical data cube.
-
-### Note for the Pangeo community
-
-This work is a bridge between the current state of the federation and more elaborated [ETL](https://es.wikipedia.org/wiki/Extract,_transform_and_load) attemps such as [Google CMIP6](https://gallery.pangeo.io/repos/pangeo-gallery/cmip6/basic_search_and_load.html) from [Pangeo](https://pangeo.io/). The later is a much more expensive workflow that requires duplication of the datasets into a cloud provider, which in advantage offers much more scalable data service compared to the "best effort" basis of the ESGF data nodes. Also, the ESGF Virtual Aggregation offers a higher level Analysis Ready Dataset by adding the `ensemble` dimension to the variables (see the [Virtual Aggregation file](https://hub.ipcc.ifca.es/thredds/fileServer/esgeva/ensemble/CMIP6/ScenarioMIP/day/CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_gr_v20190410/replicas/aims3.llnl.gov/CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_tas_gr_v20190410_aims3.llnl.gov.ncml)).
-
-![tas4d](tas4d.png)
-
-The ESGF Virtual Aggregation could act as an intermediate between the ESGF and cloud native repositories. Because ESGF Virtual Aggregation is much cheaper to run (since it only reads metadata from the ESGF distributed index), cloud repositories using cloud optimized formats (Zarr) can be created much easier. For example:
-
-```python
-import xarray
-import dask
-
-dask.config.set(scheduler="processes")
-
-# Open a dataset from the ESGF Virtual Aggregation
-ds = xarray.open_dataset("https://hub.ipcc.ifca.es/thredds/dodsC/esgeva/ensemble/CMIP6/ScenarioMIP/day/CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_gr_v20190410/replicas/aims3.llnl.gov/CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_tas_gr_v20190410_aims3.llnl.gov.ncml").chunk({"variant_label": 1, "time": 100})
-
-# Store as Zarr in a directory store
-ds.to_zarr("CMIP6_ScenarioMIP_CNRM-CERFACS_CNRM-CM6-1_ssp245_day_tas_gr_v20190410_aims3.llnl.gov.zarr")
-```
 
 ## Usage
 
