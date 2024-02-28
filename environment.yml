@@ -8,6 +8,8 @@ dependencies:
   - pandas
   - jinja2
   - xarray
+  - cf_xarray
+  - hvplot
   - netcdf4
   - dask
   - matplotlib
