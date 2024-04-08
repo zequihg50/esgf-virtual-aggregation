@@ -4,6 +4,8 @@
 
 Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
 
+Check the [THREDDS catalog](https://hub.ipcc.ifca.es/thredds) or see [run your own ESGF Virtual Aggregation](#run).
+
 ## Rationale
 
 The ESGF is a federated file distribution service for climate data. Remote data access and virtual datasets are possible through OPeNDAP and netCDF-java, available by default in all ESGF nodes. However, these capabilities have never been used. This provides:
@@ -11,7 +13,8 @@ The ESGF is a federated file distribution service for climate data. Remote data 
 - Analysis Ready Data (ARD) in the form of virtual datasets, that is, no data duplication needed.
 - Remote data access without the need to download files. Open an URL and get direct access to an analytical data cube.
 
-## Usage
+<a id="run"></a>
+## Run your own ESGF Virtual Aggregation
 
 The ESGF Virtual Aggregation data involves two steps:
 
@@ -36,7 +39,7 @@ python ncmls.py -j4 --database sample.db -p esgf_ensemble
 You will find that the virtual aggregations are NcML files. You will need a client based on netCDF-java to read them
 or you can also set up a TDS server and read via OpenDAP. See next section.
 
-### Run your own ESGF Virtual Aggregation
+### Run your own server
 
 A THREDDS Data Server (TDS) with access to the ESGF Virtual Aggregation datasets is available at `https://hub.ipcc.ifca.es/thredds`.
 
