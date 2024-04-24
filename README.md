@@ -4,7 +4,7 @@
 
 Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
 
-Check the [THREDDS catalog](https://hub.ipcc.ifca.es/thredds) or see [run your own ESGF Virtual Aggregation](#run).
+Check [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb), this [Pangeo Showcase](https://discourse.pangeo.io/t/pangeo-showcase-virtual-analysis-ready-data-for-cmip6-and-esgf/4004) or see [run your own ESGF Virtual Aggregation](#run).
 
 ## Rationale
 
