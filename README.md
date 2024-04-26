@@ -32,7 +32,6 @@ python search.py -d sample.db -s selection-sample
 Now, generate the virtual aggregations (both `esgf_dataset` and `esgf_ensemble`) from the database using 4 parallel jobs.
 
 ```bash
-python ncmls.py -j4 --database sample.db -p esgf_dataset
 python ncmls.py -j4 --database sample.db -p esgf_ensemble
 ```
 
