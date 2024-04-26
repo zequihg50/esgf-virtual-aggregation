@@ -1,10 +1,10 @@
 # ESGF Virtual Aggregation
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb)
-
 Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
 
-Check [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb), this [Pangeo Showcase](https://discourse.pangeo.io/t/pangeo-showcase-virtual-analysis-ready-data-for-cmip6-and-esgf/4004) or see [run your own ESGF Virtual Aggregation](#run).
+Run the demo [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb), check this [Pangeo Showcase](https://discourse.pangeo.io/t/pangeo-showcase-virtual-analysis-ready-data-for-cmip6-and-esgf/4004) or see [run your own ESGF Virtual Aggregation](#run).
+
+**Important** - The ESGF Virtual Aggregation depends on ESGF data nodes being available. This is not the case half of the time, expect errors when trying to load datasets. Check the status of ESGF data nodes [here](https://aims2.llnl.gov/nodes/).
 
 ## Rationale
 
