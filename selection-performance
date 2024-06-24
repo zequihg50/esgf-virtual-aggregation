@@ -1,0 +1,8 @@
+project=CMIP6 type=File
+variable_id=tas
+activity_id=ScenarioMIP
+experiment_id=ssp245
+table_id=day
+grid_label=gr
+source_id=CNRM-CM6-1
+institution_id=CNRM-CERFACS
