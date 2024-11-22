@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Cimadevilla"
+  given-names: "Ezequiel"
+  orcid: "https://orcid.org/0000-0002-8437-2068"
+- family-names: "Lawrence"
+  given-names: "Bryan"
+  orcid: "https://orcid.org/0000-0001-9262-7860"
+- family-names: "S. Cofiño"
+  given-names: "Antonio"
+  orcid: "https://orcid.org/0000-0001-7719-979X"
+title: "The ESGF Virtual Aggregation"
+version: 20240125
+date-released: 2024-11-22
+url: "https://github.com/zequihg50/esgf-virtual-aggregation"
