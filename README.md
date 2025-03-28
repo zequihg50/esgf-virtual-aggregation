@@ -1,6 +1,6 @@
 # ESGF Virtual Aggregation
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb) [![IFCA](https://img.shields.io/badge/launch-IFCA-orange)](https://hub.climate4r.ifca.es/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fzequihg50%2Fesgf-virtual-aggregation&branch=tesis&urlpath=lab%2Ftree%2Fesgf-virtual-aggregation%2Fdemo.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zequihg50/eva/HEAD?labpath=demo.ipynb) [![IFCA](https://img.shields.io/badge/launch-IFCA-orange)](https://hub.climate4r.ifca.es/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fzequihg50%2Fesgf-virtual-aggregation&branch=master&urlpath=lab%2Ftree%2Fesgf-virtual-aggregation%2Fdemo.ipynb)
 
 Remote data access to Virtual Analysis Ready Data (Virtual ARD) for climate datasets of the [ESGF](https://esgf.llnl.gov/).
 
